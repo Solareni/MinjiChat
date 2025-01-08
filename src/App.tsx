@@ -8,7 +8,7 @@ import { LogoIcon, NewConversationIcon, ConversationsIcon, DiscoverIcon, UserIco
 
 const Logo = () => {
   return (
-    <div className="text-4xl font-bold text-white animate-fade-in">
+    <div className="text-base text-foreground">
       Welcome to the Home Page!
     </div>
   );
@@ -70,11 +70,11 @@ const App: React.FC = () => {
   );
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-r from-purple-500 to-indigo-600">
+    <div className="flex min-h-screen bg-background">
       <Sidebar />
 
-      {/* 路由内容 */}
-      <div className="flex-1 p-8 bg-white/20 backdrop-blur-md shadow-lg m-6 rounded-lg">
+      {/* Main Content */}
+      <div className="flex-1 p-4">
         <Routes>{routes.map(getRoute)}</Routes>
       </div>
     </div>

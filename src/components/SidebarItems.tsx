@@ -7,7 +7,7 @@ interface SidebarItemProps {
 const SidebarItem: React.FC<SidebarItemProps> = ({ href, icon, className }) => (
   <a
     href={href}
-    className={`rounded-lg p-1 transition-colors duration-200 focus:outline-none ${className}`}
+    className={`rounded-lg p-1 text-muted ${className}`}
   >
     {icon}
   </a>
@@ -56,7 +56,7 @@ export const NewConversationIcon = () => {
           <path d="M19 16v6"></path>
         </svg>
       }
-      className="text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:bg-slate-800"
+      className="text-white hover:text-purple-300 transition-colors duration-200"
     />
   );
 };
