@@ -7,7 +7,7 @@ interface SidebarItemProps {
 const SidebarItem: React.FC<SidebarItemProps> = ({ href, icon, className }) => (
   <a
     href={href}
-    className={`rounded-lg p-1.5 transition-colors duration-200 focus:outline-none ${className}`}
+    className={`rounded-lg p-1 transition-colors duration-200 focus:outline-none ${className}`}
   >
     {icon}
   </a>
@@ -56,7 +56,7 @@ export const NewConversationIcon = () => {
           <path d="M19 16v6"></path>
         </svg>
       }
-      className="text-slate-500 hover:bg-slate-200 dark:text-slate-400 dark:hover:bg-slate-800"
+      className="text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:bg-slate-800"
     />
   );
 };
@@ -81,7 +81,7 @@ export const ConversationsIcon = () => {
           <path d="M14 15v2a1 1 0 0 1 -1 1h-7l-3 3v-10a1 1 0 0 1 1 -1h2"></path>
         </svg>
       }
-      className="bg-blue-100 text-blue-600 dark:bg-slate-800 dark:text-blue-600"
+      className="text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:bg-slate-800"
     />
   );
 };
@@ -106,7 +106,7 @@ export const DiscoverIcon = () => {
           <path d="M21 21l-6 -6"></path>
         </svg>
       }
-      className="text-slate-500 hover:bg-slate-200 dark:text-slate-400 dark:hover:bg-slate-800"
+      className="text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:bg-slate-800"
     />
   );
 };
@@ -132,7 +132,7 @@ export const UserIcon = () => {
           <path d="M6.168 18.849a4 4 0 0 1 3.832 -2.849h4a4 4 0 0 1 3.834 2.855"></path>
         </svg>
       }
-      className="text-slate-500 hover:bg-slate-200 dark:text-slate-400 dark:hover:bg-slate-800"
+      className="text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:bg-slate-800"
     />
   );
 };
@@ -157,7 +157,7 @@ export const SettingsIcon = () => {
           <path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"></path>
         </svg>
       }
-      className="text-slate-500 hover:bg-slate-200 dark:text-slate-400 dark:hover:bg-slate-800"
+      className="text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:bg-slate-800"
     />
   );
 };
