@@ -41,12 +41,14 @@ const User = () => {
 }
 
 const Settings = () => {
+  const { theme } = useTheme();
+  
   return (
-    <div className="text-4xl font-bold text-white animate-fade-in">
+    <div className={`text-4xl font-bold ${theme === 'dark' ? 'text-white' : 'text-black'} animate-fade-in`}>
       Settings
     </div>
   );
-}
+};
 export const routes = [
   { path: "/logo", element: <div />, icon: <LogoIcon />, label: "logo" },
   { path: "/new_conversation", element: <NewConversation />, icon: <NewConversationIcon />, label: "new conversation" },
