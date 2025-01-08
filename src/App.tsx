@@ -4,12 +4,65 @@ import reactLogo from "./assets/react.svg";
 import { invoke } from "@tauri-apps/api/core";
 import { Route, Routes, Link } from "react-router-dom";
 import Sidebar from "./components/Sidebar";
+import { LogoIcon, NewConversationIcon, ConversationsIcon, DiscoverIcon, UserIcon, SettingsIcon } from "./components/SidebarItems";
 
+const Logo = () => {
+  return (
+    <div className="text-4xl font-bold text-white animate-fade-in">
+      Welcome to the Home Page!
+    </div>
+  );
+}
+
+const NewConversation = () => {
+  return (
+    <div className="text-4xl font-bold text-white animate-fade-in">
+      New Conversation
+    </div>
+  );
+}
+
+const Conversations = () => {
+  return (
+    <div className="text-4xl font-bold text-white animate-fade-in">
+      Conversations
+    </div>
+  );
+}
+
+const Discover = () => {
+  return (
+    <div className="text-4xl font-bold text-white animate-fade-in">
+      Discover
+    </div>
+  );
+}
+
+const User = () => {
+  return (
+    <div className="text-4xl font-bold text-white animate-fade-in">
+      User
+    </div>
+  );
+}
+
+const Settings = () => {
+  return (
+    <div className="text-4xl font-bold text-white animate-fade-in">
+      Settings
+    </div>
+  );
+}
 export const routes = [
-  { path: "/", element: <Home />, label: "Home" },
-  { path: "/about", element: <About />, label: "About" },
-  { path: "/contact", element: <Contact />, label: "Contact" },
+  { path: "/logo", element: <Logo />, icon: <LogoIcon />, label: "logo" },
+  { path: "/new_conversation", element: <NewConversation />, icon: <NewConversationIcon />, label: "new conversation" },
+  { path: "/conversations", element: <Conversations />, icon: <ConversationsIcon />, label: "conversations" },
+  { path: "/discover", element: <Discover />, icon: <DiscoverIcon />, label: "discover" },
+  { path: "/user", element: <User />, icon: <UserIcon />, label: "user" },
+  { path: "/settings", element: <Settings />, icon: <SettingsIcon />, label: "settings" },
 ];
+
+
 
 const App: React.FC = () => {
   const getRoute = (route: { path: string; element: JSX.Element }) => (
@@ -29,30 +82,3 @@ const App: React.FC = () => {
 };
 
 export default App;
-
-// Home.js
-function Home() {
-  return (
-    <div className="text-4xl font-bold text-white animate-fade-in">
-      Welcome to the Home Page!
-    </div>
-  );
-}
-
-// About.js
-function About() {
-  return (
-    <div className="text-4xl font-bold text-white animate-fade-in">
-      About Us
-    </div>
-  );
-}
-
-// Contact.js
-function Contact() {
-  return (
-    <div className="text-4xl font-bold text-white animate-fade-in">
-      Contact Us
-    </div>
-  );
-}
