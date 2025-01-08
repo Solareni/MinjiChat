@@ -58,7 +58,7 @@ export const NewConversationIcon = () => {
           <path d="M19 16v6"></path>
         </svg>
       }
-      className="text-white hover:text-purple-300 transition-colors duration-200"
+      className="text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:bg-slate-800"
     />
   );
 };
@@ -204,7 +204,7 @@ export const ThemeToggle = () => {
           </svg>
         )
       }
-      className="text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:bg-slate-800"
+      className="text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-500"
       onClick={toggleTheme}
     />
   );

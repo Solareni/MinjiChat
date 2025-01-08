@@ -1,10 +1,11 @@
 // App.tsx
-import { useState } from "react";
+import { useContext, useState } from "react";
 import reactLogo from "./assets/react.svg";
 import { invoke } from "@tauri-apps/api/core";
 import { Route, Routes, Link } from "react-router-dom";
 import Sidebar from "./components/Sidebar";
 import { LogoIcon, NewConversationIcon, ConversationsIcon, DiscoverIcon, UserIcon, SettingsIcon, ThemeToggle } from "./components/SidebarItems";
+import { useTheme } from "./ThemeContext";
 
 
 const NewConversation = () => {
@@ -56,15 +57,16 @@ export const routes = [
   { path: "/settings", element: <Settings />, icon: <SettingsIcon />, label: "settings" },
 ];
 
-
+const getRoute = (route: { path: string; element: JSX.Element }) => (
+  <Route key={route.path} path={route.path} element={route.element} />
+);
 
 const App: React.FC = () => {
-  const getRoute = (route: { path: string; element: JSX.Element }) => (
-    <Route key={route.path} path={route.path} element={route.element} />
-  );
+
+  const { theme } = useTheme();
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className={`flex min-h-screen ${theme === 'light' ? 'bg-white' : 'bg-background' }`}>
       <Sidebar />
 
       {/* Main Content */}
