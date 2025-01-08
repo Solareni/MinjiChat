@@ -4,15 +4,8 @@ import reactLogo from "./assets/react.svg";
 import { invoke } from "@tauri-apps/api/core";
 import { Route, Routes, Link } from "react-router-dom";
 import Sidebar from "./components/Sidebar";
-import { LogoIcon, NewConversationIcon, ConversationsIcon, DiscoverIcon, UserIcon, SettingsIcon } from "./components/SidebarItems";
+import { LogoIcon, NewConversationIcon, ConversationsIcon, DiscoverIcon, UserIcon, SettingsIcon, ThemeToggle } from "./components/SidebarItems";
 
-const Logo = () => {
-  return (
-    <div className="text-base text-foreground">
-      Welcome to the Home Page!
-    </div>
-  );
-}
 
 const NewConversation = () => {
   return (
@@ -54,11 +47,12 @@ const Settings = () => {
   );
 }
 export const routes = [
-  { path: "/logo", element: <Logo />, icon: <LogoIcon />, label: "logo" },
+  { path: "/logo", element: <div />, icon: <LogoIcon />, label: "logo" },
   { path: "/new_conversation", element: <NewConversation />, icon: <NewConversationIcon />, label: "new conversation" },
   { path: "/conversations", element: <Conversations />, icon: <ConversationsIcon />, label: "conversations" },
   { path: "/discover", element: <Discover />, icon: <DiscoverIcon />, label: "discover" },
   { path: "/user", element: <User />, icon: <UserIcon />, label: "user" },
+  { path: "/theme", element: <div />, icon: <ThemeToggle />, label: "theme"},
   { path: "/settings", element: <Settings />, icon: <SettingsIcon />, label: "settings" },
 ];
 
