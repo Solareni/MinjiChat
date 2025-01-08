@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import React from "react";
 import { routes } from "../App";
 import { useTheme } from "../ThemeContext";
+import { ThemeToggle } from "./SidebarItems";
 
 const Sidebar: React.FC = () => {
   const { theme } = useTheme();
@@ -17,6 +18,11 @@ const Sidebar: React.FC = () => {
           {route.icon}
         </Link>
       ))}
+      
+      {/* Theme Toggle at Bottom */}
+      <div className="mt-auto">
+        <ThemeToggle />
+      </div>
     </div>
   );
 };

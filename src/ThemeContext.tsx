@@ -4,7 +4,7 @@ type Theme = "light" | "dark";
 
 interface ThemeContextType {
   theme: Theme;
-  toggleTheme: () => void;
+  toggleTheme: (e:React.MouseEvent<HTMLElement>) => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -12,7 +12,8 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [theme, setTheme] = useState<Theme>("light");
 
-  const toggleTheme = () => {
+  const toggleTheme = (e: React.MouseEvent<HTMLElement>) => {
+    e.preventDefault();
     setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
   };
 
