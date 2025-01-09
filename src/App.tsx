@@ -85,6 +85,7 @@ export const routes = [
   { path: "/conversations", element: <Conversations />, icon: <ConversationsIcon />, label: "conversations" },
   { path: "/discover", element: <Discover />, icon: <DiscoverIcon />, label: "discover" },
   { path: "/user", element: <User />, icon: <UserIcon />, label: "user" },
+  { path: "/theme", element: <div />, icon: <ThemeToggle />, label: "theme" },
   { path: "/settings", element: <Settings />, icon: <SettingsIcon />, label: "settings" },
 ];
 
