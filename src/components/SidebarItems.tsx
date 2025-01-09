@@ -174,6 +174,32 @@ export const SettingsIcon = () => {
   );
 };
 
+export const AudioIcon = () => {
+  return (
+    <SidebarItem
+      href="#"
+      icon={
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-6 w-6"
+          viewBox="0 0 24 24"
+          strokeWidth="2"
+          stroke="currentColor"
+          fill="none"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+          <path d="M15 8a5 5 0 0 1 0 8"></path>
+          <path d="M17.7 5a9 9 0 0 1 0 14"></path>
+          <path d="M6 15h-2a1 1 0 0 1 -1 -1v-4a1 1 0 0 1 1 -1h2l3.5 -4.5a.8 .8 0 0 1 1.5 .5v14a.8 .8 0 0 1 -1.5 .5l-3.5 -4.5"></path>
+        </svg>
+      }
+      className="text-slate-500 hover:text-blue-600 dark:text-slate-500 dark:hover:text-blue-600"
+    />
+  );
+};
+
 export const ThemeToggle = () => {
   const { theme, toggleTheme } = useTheme();
 

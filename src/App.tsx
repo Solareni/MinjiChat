@@ -12,7 +12,11 @@ import {
   UserIcon,
   SettingsIcon,
   ThemeToggle,
+  AudioIcon,
 } from "./components/SidebarItems";
+
+import Audio from "./components/Audio";
+import Settings from "./components/Settings";
 import { useTheme } from "./ThemeContext";
 
 const NewConversation = () => {
@@ -47,13 +51,7 @@ const User = () => {
   );
 };
 
-const Settings = () => {
-  return (
-    <div className="text-4xl font-bold dark:text-white text-black animate-fade-in">
-      Settings
-    </div>
-  );
-};
+
 export const routes = [
   { path: "/logo", element: <div />, icon: <LogoIcon />, label: "logo" },
   {
@@ -73,6 +71,12 @@ export const routes = [
     element: <Discover />,
     icon: <DiscoverIcon />,
     label: "discover",
+  },
+  {
+    path: "/audio",
+    element: <Audio />,
+    icon: <AudioIcon />,
+    label: "audio",
   },
   { path: "/user", element: <User />, icon: <UserIcon />, label: "user" },
   { path: "/theme", element: <div />, icon: <ThemeToggle />, label: "theme" },
