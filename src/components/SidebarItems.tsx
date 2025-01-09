@@ -1,3 +1,5 @@
+import { useTheme } from "../ThemeContext";
+
 interface SidebarItemProps {
   href: string;
   icon: JSX.Element;
@@ -5,7 +7,12 @@ interface SidebarItemProps {
   onClick?: (e: React.MouseEvent<HTMLElement>) => void;
 }
 
-const SidebarItem: React.FC<SidebarItemProps> = ({ href, icon, className, onClick }) => (
+const SidebarItem: React.FC<SidebarItemProps> = ({
+  href,
+  icon,
+  className,
+  onClick,
+}) => (
   <a
     href={href}
     className={`rounded-lg p-0 text-muted ${className}`}
@@ -31,6 +38,9 @@ export const LogoIcon = () => {
         </svg>
       }
       className="mb-1"
+      onClick={(e) => {
+        e.preventDefault();
+      }}
     />
   );
 };
@@ -138,8 +148,6 @@ export const UserIcon = () => {
     />
   );
 };
-
-import { useTheme } from "../ThemeContext";
 
 export const SettingsIcon = () => {
   return (
