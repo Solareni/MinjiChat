@@ -1,7 +1,7 @@
 // Sidebar.tsx
 import { NavLink } from "react-router-dom";
 import React from "react";
-import { routes } from "../App";
+import { routes } from "../router";
 
 const Sidebar: React.FC = () => {
   return (
