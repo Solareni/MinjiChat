@@ -8,7 +8,7 @@ interface SidebarItemProps {
 const SidebarItem: React.FC<SidebarItemProps> = ({ href, icon, className, onClick }) => (
   <a
     href={href}
-    className={`rounded-lg p-1 text-muted ${className}`}
+    className={`rounded-lg p-0 text-muted ${className}`}
     onClick={onClick}
   >
     {icon}
