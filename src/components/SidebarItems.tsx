@@ -2,7 +2,7 @@ interface SidebarItemProps {
   href: string;
   icon: JSX.Element;
   className?: string;
-  onClick?: () => void;
+  onClick?: (e: React.MouseEvent<HTMLElement>) => void;
 }
 
 const SidebarItem: React.FC<SidebarItemProps> = ({ href, icon, className, onClick }) => (
