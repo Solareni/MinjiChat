@@ -1,11 +1,6 @@
-// App.tsx
-import { useContext, useEffect, useState } from "react";
-import reactLogo from "./assets/react.svg";
-import { invoke } from "@tauri-apps/api/core";
-import { Routes } from "react-router-dom";
-import Sidebar from "./components/Sidebar";
 import { useTheme } from "./ThemeContext";
-import { routes, getRoute } from "./router";
+import Sidebar from "./components/Sidebar";
+import { Outlet } from "react-router-dom";
 
 const App: React.FC = () => {
   const { theme } = useTheme();
@@ -17,7 +12,7 @@ const App: React.FC = () => {
 
         {/* Main Content */}
         <div className="flex-1 p-4 dark:text-white text-black">
-          <Routes>{routes.map(getRoute)}</Routes>
+          <Outlet />
         </div>
       </div>
     </div>

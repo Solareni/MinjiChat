@@ -1,4 +1,4 @@
-import { Route } from "react-router-dom";
+import { RouteObject } from "react-router-dom";
 import {
   LogoIcon,
   NewConversationIcon,
@@ -43,14 +43,11 @@ const User = () => {
     </div>
   );
 };
-interface RouteConfig {
-  path?: string;
-  index?: boolean;
-  element?: JSX.Element;
+
+export type RouteConfig = RouteObject & {
   icon?: JSX.Element;
   label?: string;
-  children?: RouteConfig[];
-}
+};
 
 export const routes: RouteConfig[] = [
   { path: "/logo", element: <div />, icon: <LogoIcon />, label: "logo" },
@@ -90,17 +87,12 @@ export const routes: RouteConfig[] = [
         path: "audio",
         element: <div className="text-4xl font-bold dark:text-white text-black animate-fade-in">音频设置</div>,
         label: "音频设置"
-      },
+      } as RouteConfig,
       {
         path: "about",
         element: <div className="text-4xl font-bold dark:text-white text-black animate-fade-in">关于我们</div>,
         label: "关于我们"
-      }
+      } as RouteConfig
     ]
   },
 ];
-
-export const getRoute = (route: RouteConfig) =>
-  route.path && (
-    <Route key={route.path} path={route.path} element={route.element} />
-  );
