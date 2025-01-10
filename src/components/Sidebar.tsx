@@ -1,6 +1,5 @@
 // Sidebar.tsx
 import { NavLink } from "react-router-dom";
-import React from "react";
 import {
   AudioIcon,
   ConversationsIcon,
@@ -11,60 +10,43 @@ import {
   ThemeToggle,
   UserIcon,
 } from "./SidebarItems";
+import { router } from "../router";
 
-const routes = [
-  {
-    path: "/logo",
-    icon: <LogoIcon />,
-    label: "logo",
-  },
-  {
-    path: "/new_conversation",
-    icon: <NewConversationIcon />,
-    label: "new conversation",
-  },
-  {
-    path: "/conversations",
-    icon: <ConversationsIcon />,
-    label: "conversations",
-  },
-  {
-    path: "/discover",
-    icon: <DiscoverIcon />,
-    label: "discover",
-  },
-  {
-    path: "/audio",
-    icon: <AudioIcon />,
-    label: "audio",
-  },
-  {
-    path: "/user",
-    icon: <UserIcon />,
-    label: "user",
-  },
-  {
-    path: "/theme",
-    icon: <ThemeToggle />,
-    label: "theme",
-  },
-  {
-    path: "/settings",
-    icon: <SettingsIcon />,
-    label: "settings",
-  },
-];
+
+const getIcon = (path: string) => {
+  switch (path) {
+    case "logo":
+      return <LogoIcon />;
+    case "new_conversation":
+      return <NewConversationIcon />;
+    case "conversations":
+      return <ConversationsIcon />;
+    case "discover":
+      return <DiscoverIcon />;
+    case "audio":
+      return <AudioIcon />;
+    case "user":
+      return <UserIcon />;
+    case "theme":
+      return <ThemeToggle />;
+    case "settings":
+      return <SettingsIcon />;
+    default:
+      return <LogoIcon />;
+  }
+}
 
 const Sidebar = () => {
+  const sidebars = router.routes[0].children;
   return (
     <div className="flex h-screen w-12 flex-col items-center bg-background border-r border-border p-2 sm:w-16">
-      {/* Navigation Links */}
-      {routes
-        // .filter((route) => !["logo", "theme"].includes(route.label))
-        .map((route) => (
+      {sidebars && sidebars
+        .map((route) => {
+          const path = route.path!;
+          return (
           <NavLink
-            key={route.path}
-            to={route.path}
+            key={path}
+            to={path}
             className={({ isActive }) =>
               `w-8 h-8 flex items-center justify-center rounded-full transition-colors mb-8 ${
                 isActive
@@ -73,9 +55,9 @@ const Sidebar = () => {
               }`
             }
           >
-            {route.icon}
+           {getIcon(path)}
           </NavLink>
-        ))}
+        )})}
     </div>
   );
 };

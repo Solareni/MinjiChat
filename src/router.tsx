@@ -1,7 +1,9 @@
-import { createHashRouter } from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
 import Audio from "./components/Audio";
 import Settings from "./components/Settings";
 import Layout from "./App";
+import AudioSettings from "./components/Settings/AudioSettings";
+import About from "./components/Settings/About";
 
 const NewConversation = () => {
   return (
@@ -35,7 +37,7 @@ const User = () => {
   );
 };
 
-export const router = createHashRouter([
+export const router = createBrowserRouter([
   {
     path: "/",
     element: <Layout />,
@@ -48,24 +50,16 @@ export const router = createHashRouter([
       { path: "user", element: <User /> },
       { path: "theme", element: <div /> },
       {
-        path: "settings/*",
+        path: "settings",
         element: <Settings />,
         children: [
           {
             path: "audio",
-            element: (
-              <div className="text-4xl font-bold dark:text-white text-black animate-fade-in">
-                音频设置
-              </div>
-            ),
+            element: <AudioSettings />,
           },
           {
             path: "about",
-            element: (
-              <div className="text-4xl font-bold dark:text-white text-black animate-fade-in">
-                关于我们
-              </div>
-            ),
+            element: <About />,
           },
         ],
       },
