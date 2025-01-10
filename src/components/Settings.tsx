@@ -1,20 +1,10 @@
 import { Routes, Route, Link, useLocation } from "react-router-dom";
-
-const settingsRoutes = [
-  {
-    path: "audio",
-    label: "音频设置",
-    element: <div className="text-4xl font-bold dark:text-white text-black animate-fade-in">音频设置</div>
-  },
-  {
-    path: "about",
-    label: "关于我们",
-    element: <div className="text-4xl font-bold dark:text-white text-black animate-fade-in">关于我们</div>
-  }
-];
+import { routeConfig } from "../router";
 
 const Settings = () => {
   const location = useLocation();
+  const settingsRoutes = routeConfig.settings;
+
   return (
     <div className="flex h-full">
       {/* 左侧导航栏 */}
@@ -53,6 +43,5 @@ const Settings = () => {
     </div>
   );
 };
-
 
 export default Settings;
