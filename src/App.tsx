@@ -2,7 +2,6 @@ import { useTheme } from "./ThemeContext";
 import Sidebar from "./components/Sidebar";
 import { Outlet } from "react-router-dom";
 
-
 const Layout: React.FC = () => {
   const { theme } = useTheme();
 

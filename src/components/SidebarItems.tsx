@@ -11,10 +11,7 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
   className,
   onClick,
 }) => (
-  <div
-    className={`rounded-lg p-1 text-muted ${className}`}
-    onClick={onClick}
-  >
+  <div className={`rounded-lg p-1 text-muted ${className}`} onClick={onClick}>
     {icon}
   </div>
 );

@@ -1,8 +1,16 @@
 // Sidebar.tsx
 import { NavLink } from "react-router-dom";
 import React from "react";
-import { AudioIcon, ConversationsIcon, DiscoverIcon, LogoIcon, NewConversationIcon, SettingsIcon, ThemeToggle, UserIcon } from "./SidebarItems";
-
+import {
+  AudioIcon,
+  ConversationsIcon,
+  DiscoverIcon,
+  LogoIcon,
+  NewConversationIcon,
+  SettingsIcon,
+  ThemeToggle,
+  UserIcon,
+} from "./SidebarItems";
 
 const routes = [
   {
@@ -43,9 +51,9 @@ const routes = [
   {
     path: "/settings",
     icon: <SettingsIcon />,
-    label: "settings"
-  }
-]
+    label: "settings",
+  },
+];
 
 const Sidebar = () => {
   return (

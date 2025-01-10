@@ -1,4 +1,4 @@
-import { createHashRouter, RouteObject } from "react-router-dom";
+import { createHashRouter } from "react-router-dom";
 import Audio from "./components/Audio";
 import Settings from "./components/Settings";
 import Layout from "./App";
@@ -51,10 +51,24 @@ export const router = createHashRouter([
         path: "settings/*",
         element: <Settings />,
         children: [
-          { path: "audio", element:  <div className="text-4xl font-bold dark:text-white text-black animate-fade-in">音频设置</div> },
-          { path: "about", element:  <div className="text-4xl font-bold dark:text-white text-black animate-fade-in">关于我们</div> }
-        ]
+          {
+            path: "audio",
+            element: (
+              <div className="text-4xl font-bold dark:text-white text-black animate-fade-in">
+                音频设置
+              </div>
+            ),
+          },
+          {
+            path: "about",
+            element: (
+              <div className="text-4xl font-bold dark:text-white text-black animate-fade-in">
+                关于我们
+              </div>
+            ),
+          },
+        ],
       },
-    ]
-  }
+    ],
+  },
 ]);

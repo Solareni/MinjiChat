@@ -4,7 +4,7 @@ type Theme = "light" | "dark";
 
 interface ThemeContextType {
   theme: Theme;
-  toggleTheme: (e:React.MouseEvent<HTMLElement>) => void;
+  toggleTheme: (e: React.MouseEvent<HTMLElement>) => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
