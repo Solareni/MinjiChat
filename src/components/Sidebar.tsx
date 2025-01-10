@@ -1,18 +1,53 @@
 // Sidebar.tsx
 import { NavLink } from "react-router-dom";
 import React from "react";
+import { AudioIcon, ConversationsIcon, DiscoverIcon, LogoIcon, NewConversationIcon, SettingsIcon, ThemeToggle, UserIcon } from "./SidebarItems";
 
-export type RouteConfig = {
-  path: string;
-  icon: JSX.Element;
-  label: string;
-};
 
-interface SidebarProps {
-  routes: RouteConfig[];
-}
+const routes = [
+  {
+    path: "/logo",
+    icon: <LogoIcon />,
+    label: "logo",
+  },
+  {
+    path: "/new_conversation",
+    icon: <NewConversationIcon />,
+    label: "new conversation",
+  },
+  {
+    path: "/conversations",
+    icon: <ConversationsIcon />,
+    label: "conversations",
+  },
+  {
+    path: "/discover",
+    icon: <DiscoverIcon />,
+    label: "discover",
+  },
+  {
+    path: "/audio",
+    icon: <AudioIcon />,
+    label: "audio",
+  },
+  {
+    path: "/user",
+    icon: <UserIcon />,
+    label: "user",
+  },
+  {
+    path: "/theme",
+    icon: <ThemeToggle />,
+    label: "theme",
+  },
+  {
+    path: "/settings",
+    icon: <SettingsIcon />,
+    label: "settings"
+  }
+]
 
-const Sidebar: React.FC<SidebarProps> = ({ routes }) => {
+const Sidebar = () => {
   return (
     <div className="flex h-screen w-12 flex-col items-center bg-background border-r border-border p-2 sm:w-16">
       {/* Navigation Links */}

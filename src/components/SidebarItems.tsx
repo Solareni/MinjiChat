@@ -1,31 +1,27 @@
 import { useTheme } from "../ThemeContext";
 
 interface SidebarItemProps {
-  href: string;
   icon: JSX.Element;
   className?: string;
   onClick?: (e: React.MouseEvent<HTMLElement>) => void;
 }
 
 const SidebarItem: React.FC<SidebarItemProps> = ({
-  href,
   icon,
   className,
   onClick,
 }) => (
-  <a
-    href={href}
+  <div
     className={`rounded-lg p-1 text-muted ${className}`}
     onClick={onClick}
   >
     {icon}
-  </a>
+  </div>
 );
 
 export const LogoIcon = () => {
   return (
     <SidebarItem
-      href="#"
       icon={
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -48,7 +44,6 @@ export const LogoIcon = () => {
 export const NewConversationIcon = () => {
   return (
     <SidebarItem
-      href="#"
       icon={
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -76,7 +71,6 @@ export const NewConversationIcon = () => {
 export const ConversationsIcon = () => {
   return (
     <SidebarItem
-      href="#"
       icon={
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -101,7 +95,6 @@ export const ConversationsIcon = () => {
 export const DiscoverIcon = () => {
   return (
     <SidebarItem
-      href="#"
       icon={
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -126,7 +119,6 @@ export const DiscoverIcon = () => {
 export const UserIcon = () => {
   return (
     <SidebarItem
-      href="#"
       icon={
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -152,7 +144,6 @@ export const UserIcon = () => {
 export const SettingsIcon = () => {
   return (
     <SidebarItem
-      href="#"
       icon={
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -177,7 +168,6 @@ export const SettingsIcon = () => {
 export const AudioIcon = () => {
   return (
     <SidebarItem
-      href="#"
       icon={
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -205,7 +195,6 @@ export const ThemeToggle = () => {
 
   return (
     <SidebarItem
-      href="#"
       icon={
         theme === "light" ? (
           <svg
