@@ -1,9 +1,18 @@
 // Sidebar.tsx
 import { NavLink } from "react-router-dom";
 import React from "react";
-import { routes } from "../router";
 
-const Sidebar: React.FC = () => {
+export type RouteConfig = {
+  path: string;
+  icon: JSX.Element;
+  label: string;
+};
+
+interface SidebarProps {
+  routes: RouteConfig[];
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ routes }) => {
   return (
     <div className="flex h-screen w-12 flex-col items-center bg-background border-r border-border p-2 sm:w-16">
       {/* Navigation Links */}

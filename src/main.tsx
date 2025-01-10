@@ -1,18 +1,9 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App";
 import "./index.css";
-import { RouterProvider, createHashRouter } from "react-router-dom";
+import { RouterProvider } from "react-router-dom";
 import { ThemeProvider } from "./ThemeContext";
-import { routes } from "./router";
-
-const router = createHashRouter([
-  {
-    path: "/",
-    element: <App />,
-    children: routes
-  }
-]);
+import { router } from "./router";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>

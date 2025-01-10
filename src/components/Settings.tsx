@@ -1,11 +1,20 @@
-import { Routes, Route, Link, useLocation, useRoutes } from "react-router-dom";
-import { routes } from "../router";
+import { Routes, Route, Link, useLocation } from "react-router-dom";
+
+const settingsRoutes = [
+  {
+    path: "audio",
+    label: "音频设置",
+    element: <div className="text-4xl font-bold dark:text-white text-black animate-fade-in">音频设置</div>
+  },
+  {
+    path: "about",
+    label: "关于我们",
+    element: <div className="text-4xl font-bold dark:text-white text-black animate-fade-in">关于我们</div>
+  }
+];
 
 const Settings = () => {
   const location = useLocation();
-  const settingsRoutes = routes.find(route => route.label === 'settings')?.children || [];
-
-  console.log(`${JSON.stringify(settingsRoutes)}`)
   return (
     <div className="flex h-full">
       {/* 左侧导航栏 */}

@@ -1,16 +1,7 @@
-import { RouteObject } from "react-router-dom";
-import {
-  LogoIcon,
-  NewConversationIcon,
-  ConversationsIcon,
-  DiscoverIcon,
-  UserIcon,
-  SettingsIcon,
-  ThemeToggle,
-  AudioIcon,
-} from "./components/SidebarItems";
+import { createHashRouter, RouteObject } from "react-router-dom";
 import Audio from "./components/Audio";
 import Settings from "./components/Settings";
+import App from "./App";
 
 const NewConversation = () => {
   return (
@@ -44,55 +35,32 @@ const User = () => {
   );
 };
 
-export type RouteConfig = RouteObject & {
-  icon?: JSX.Element;
-  label?: string;
-};
-
-export const routes: RouteConfig[] = [
-  { path: "/logo", element: <div />, icon: <LogoIcon />, label: "logo" },
+export const router = createHashRouter([
   {
-    path: "/new_conversation",
-    element: <NewConversation />,
-    icon: <NewConversationIcon />,
-    label: "new conversation",
-  },
-  {
-    path: "/conversations",
-    element: <Conversations />,
-    icon: <ConversationsIcon />,
-    label: "conversations",
-  },
-  {
-    path: "/discover",
-    element: <Discover />,
-    icon: <DiscoverIcon />,
-    label: "discover",
-  },
-  {
-    path: "/audio",
-    element: <Audio />,
-    icon: <AudioIcon />,
-    label: "audio",
-  },
-  { path: "/user", element: <User />, icon: <UserIcon />, label: "user" },
-  { path: "/theme", element: <div />, icon: <ThemeToggle />, label: "theme" },
-  {
-    path: "/settings/*",
-    element: <Settings />,
-    icon: <SettingsIcon />,
-    label: "settings",
+    path: "/",
+    element: <App />,
     children: [
+      { path: "/logo", element: <div /> },
+      { path: "/new_conversation", element: <NewConversation /> },
+      { path: "/conversations", element: <Conversations /> },
+      { path: "/discover", element: <Discover /> },
+      { path: "/audio", element: <Audio /> },
+      { path: "/user", element: <User /> },
+      { path: "/theme", element: <div /> },
       {
-        path: "audio",
-        element: <div className="text-4xl font-bold dark:text-white text-black animate-fade-in">音频设置</div>,
-        label: "音频设置"
-      } as RouteConfig,
-      {
-        path: "about",
-        element: <div className="text-4xl font-bold dark:text-white text-black animate-fade-in">关于我们</div>,
-        label: "关于我们"
-      } as RouteConfig
+        path: "/settings/*",
+        element: <Settings />,
+        children: [
+          {
+            path: "audio",
+            element: <div className="text-4xl font-bold dark:text-white text-black animate-fade-in">音频设置</div>
+          },
+          {
+            path: "about",
+            element: <div className="text-4xl font-bold dark:text-white text-black animate-fade-in">关于我们</div>
+          }
+        ]
+      },
     ]
-  },
-];
+  }
+]);
