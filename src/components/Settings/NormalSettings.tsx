@@ -19,7 +19,7 @@ export default function NormalSettings() {
         <select
           value={theme}
           onChange={(e) => setTheme(e.target.value as "light" | "dark")}
-          className="px-4 py-2 bg-gray-200 rounded dark:bg-gray-700 dark:text-white"
+          className="px-4 py-2 rounded border border-gray-300 hover:border-blue-500 focus:border-blue-500 focus:outline-none dark:text-black w-48 text-left"
         >
           <option value="light">{t("light_theme")}</option>
           <option value="dark">{t("dark_theme")}</option>
@@ -32,7 +32,7 @@ export default function NormalSettings() {
         <select
           value={i18n.language}
           onChange={(e) => changeLanguage(e.target.value)}
-          className="px-4 py-2 bg-gray-200 rounded dark:bg-gray-700 dark:text-white"
+          className="px-4 py-2 rounded border border-gray-300 hover:border-blue-500 focus:border-blue-500 focus:outline-none dark:text-black w-48 text-left"
         >
           <option value="en">English</option>
           <option value="zh">中文</option>
