@@ -5,6 +5,7 @@ import Layout from "./Layout";
 import WhisperSettings from "./components/Settings/WhisperSettings";
 import AboutMe from "./components/Settings/AboutMe";
 import NormalSettings from "./components/Settings/NormalSettings";
+import { WhisperDetail } from "./components/WhisperDetail";
 
 const NewConversation = () => {
   return (
@@ -47,7 +48,11 @@ export const router = createBrowserRouter([
       { path: "new_conversation", element: <NewConversation /> },
       { path: "conversations", element: <Conversations /> },
       { path: "discover", element: <Discover /> },
-      { path: "whisper", element: <Whispser /> },
+      { path: "whisper", children:[ 
+        { index: true, element: <Whispser /> },
+        { path: ":id", element: <WhisperDetail /> } // 新增详情页
+        ]
+      },
       { path: "user", element: <User /> },
       { path: "theme", element: <div /> },
       {

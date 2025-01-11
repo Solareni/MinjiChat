@@ -1,5 +1,43 @@
 import { FixedSizeList } from "react-window";
+import { WhisperItem } from "../types";
 import { ActionIcon, ContentIcon } from "./SidebarItems";
+import { Link, useParams } from "react-router-dom";
+
+interface ListItemProps {
+	index: number;
+	style: React.CSSProperties;
+}
+
+const ListItem = ({ index, style }: ListItemProps) => {
+	return (
+    <Link to={`/whisper/${index + 1}`} style={style} className="block">
+      <div className="grid grid-cols-[2fr_1fr_100px] items-center hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+        {/* 文件信息 */}
+        <div className="flex items-center gap-4">
+          <ContentIcon />
+          <div>
+            <div className="font-medium">文件名 {index}</div>
+            <div className="text-sm text-gray-500">00:30</div>
+          </div>
+        </div>
+
+        {/* 创建时间 */}
+        <div className="text-sm text-gray-500">2023-10-01</div>
+
+        {/* 操作 */}
+        <div className="flex justify-end">
+          <ActionIcon />
+        </div>
+      </div>
+    </Link>
+  );
+};
+const whisperData: WhisperItem[] = Array.from({ length: 100 }, (_, i) => ({
+	id: i + 1,
+	fileName: `文件名 ${i + 1}`,
+	duration: "00:30",
+	createdAt: "2023-10-01",
+}));
 const Whispser = () => {
 	return (
 		<div className="w-full max-w-5xl mx-auto p-4">
@@ -32,33 +70,11 @@ const Whispser = () => {
 			<div className="h-[600px]">
 				<FixedSizeList
 					height={600}
-					itemCount={100} // 替换为实际数据长度
+					itemCount={whisperData.length}
 					itemSize={80}
 					width="100%"
 				>
-					{({ index, style }) => (
-						<div
-							style={style}
-							className="grid grid-cols-[2fr_1fr_100px] items-center"
-						>
-							{/* 文件信息 */}
-							<div className="flex items-center gap-4">
-								<ContentIcon />
-								<div>
-									<div className="font-medium">文件名 {index}</div>
-									<div className="text-sm text-gray-500">00:30</div>
-								</div>
-							</div>
-
-							{/* 创建时间 */}
-							<div className="text-sm text-gray-500">2023-10-01</div>
-
-							{/* 操作 */}
-							<div className="flex justify-end">
-								<ActionIcon />
-							</div>
-						</div>
-					)}
+					{({ index, style }) => <ListItem index={index} style={style} />}
 				</FixedSizeList>
 			</div>
 		</div>
