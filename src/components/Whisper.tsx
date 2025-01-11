@@ -1,4 +1,4 @@
-const Audio = () => {
+const Whipser = () => {
     return (
       <div className="text-4xl font-bold dark:text-white text-black animate-fade-in">
         Audio
@@ -7,4 +7,4 @@ const Audio = () => {
   };
 
 
-export default Audio;
+export default Whipser;

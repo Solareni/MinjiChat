@@ -1,7 +1,7 @@
 // Sidebar.tsx
 import { NavLink } from "react-router-dom";
 import {
-  AudioIcon,
+  WhisperIcon,
   ConversationsIcon,
   DiscoverIcon,
   LogoIcon,
@@ -23,8 +23,8 @@ const getIcon = (path: string) => {
       return <ConversationsIcon />;
     case "discover":
       return <DiscoverIcon />;
-    case "audio":
-      return <AudioIcon />;
+    case "whisper":
+      return <WhisperIcon />;
     case "user":
       return <UserIcon />;
     case "theme":

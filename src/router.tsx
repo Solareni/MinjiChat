@@ -1,8 +1,8 @@
 import { createBrowserRouter } from "react-router-dom";
-import Audio from "./components/Audio";
+import Whipser from "./components/Whisper";
 import Settings from "./components/Settings";
-import Layout from "./App";
-import AudioSettings from "./components/Settings/AudioSettings";
+import Layout from "./Layout";
+import WhisperSettings from "./components/Settings/WhisperSettings";
 import About from "./components/Settings/About";
 
 const NewConversation = () => {
@@ -46,7 +46,7 @@ export const router = createBrowserRouter([
       { path: "new_conversation", element: <NewConversation /> },
       { path: "conversations", element: <Conversations /> },
       { path: "discover", element: <Discover /> },
-      { path: "audio", element: <Audio /> },
+      { path: "whisper", element: <Whipser /> },
       { path: "user", element: <User /> },
       { path: "theme", element: <div /> },
       {
@@ -54,8 +54,8 @@ export const router = createBrowserRouter([
         element: <Settings />,
         children: [
           {
-            path: "audio",
-            element: <AudioSettings />,
+            path: "whisper_settings",
+            element: <WhisperSettings />,
           },
           {
             path: "about",

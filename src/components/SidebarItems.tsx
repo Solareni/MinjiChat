@@ -162,7 +162,7 @@ export const SettingsIcon = () => {
   );
 };
 
-export const AudioIcon = () => {
+export const WhisperIcon = () => {
   return (
     <SidebarItem
       icon={
