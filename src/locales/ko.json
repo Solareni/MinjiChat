@@ -1,0 +1,10 @@
+{
+    "normal_settings": "일반 설정",
+    "whisper_settings": "속삭임 설정",
+    "about_me": "내 정보",
+    "toggle_theme": "테마 전환", 
+    "theme": "테마",
+    "light_theme": "라이트 테마",
+    "dark_theme": "다크 테마",
+    "language": "언어"
+}

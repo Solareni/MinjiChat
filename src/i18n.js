@@ -3,6 +3,9 @@ import { initReactI18next } from "react-i18next";
 
 import zh from "./locales/zh.json";
 import en from "./locales/en.json";
+import zhHant from "./locales/zh-Hant.json";
+import ja from "./locales/ja.json";
+import ko from "./locales/ko.json";
 
 const resources = {
   zh: {
@@ -10,6 +13,15 @@ const resources = {
   },
   en: {
     translation: en,
+  },
+  "zh-Hant": {
+    translation: zhHant,
+  },
+  ja: {
+    translation: ja,
+  },
+  ko: {
+    translation: ko,
   },
 };
 

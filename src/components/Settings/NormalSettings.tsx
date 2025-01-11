@@ -35,7 +35,10 @@ export default function NormalSettings() {
           className="px-4 py-2 rounded border border-gray-300 hover:border-blue-500 focus:border-blue-500 focus:outline-none dark:text-black w-48 text-left"
         >
           <option value="en">English</option>
-          <option value="zh">中文</option>
+          <option value="zh">简体中文</option>
+          <option value="zh-Hant">繁體中文</option>
+          <option value="ja">日本語</option>
+          <option value="ko">한국어</option>
         </select>
       </div>
     </div>
