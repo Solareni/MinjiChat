@@ -6,5 +6,10 @@
     "theme": "主题",
     "light_theme": "浅色主题",
     "dark_theme": "深色主题",
-    "language": "语言"
+    "language": "语言",
+    "ffmpeg_load": "FFmpeg包导入",
+    "whisper_load": "Whisper模型导入",
+    "compute_mode": "计算模式",
+    "whisper_prompt": "whisper提示词",
+    "whisper_prompt_placeholder": "请输入whisper提示词"
 }

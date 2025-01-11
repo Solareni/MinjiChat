@@ -6,5 +6,10 @@
     "theme": "Theme",
     "light_theme": "Light Theme",
     "dark_theme": "Dark Theme",
-    "language": "Language"
+    "language": "Language",
+    "ffmpeg_load": "FFmpeg Package Import",
+    "whisper_load": "Whisper Model Import",
+    "compute_mode": "Compute Mode",
+    "whisper_prompt": "Whisper Prompt",
+    "whisper_prompt_placeholder": "Please enter whisper prompt"
 }

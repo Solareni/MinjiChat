@@ -1,10 +1,15 @@
 {
     "normal_settings": "一般設定",
-    "whisper_settings": "耳語設定", 
+    "whisper_settings": "耳語設定",
     "about_me": "關於我",
     "toggle_theme": "切換主題",
     "theme": "主題",
     "light_theme": "淺色主題",
     "dark_theme": "深色主題",
-    "language": "語言"
+    "language": "語言",
+    "ffmpeg_load": "FFmpeg套件導入",
+    "whisper_load": "Whisper模型導入",
+    "compute_mode": "計算模式",
+    "whisper_prompt": "Whisper提示詞",
+    "whisper_prompt_placeholder": "請輸入Whisper提示詞"
 }

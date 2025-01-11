@@ -11,7 +11,7 @@ const Layout: React.FC = () => {
         <Sidebar />
 
         {/* Main Content */}
-        <div className="flex-1 p-4 dark:text-white text-black">
+        <div className="flex-1 dark:text-white text-black">
           <Outlet />
         </div>
       </div>

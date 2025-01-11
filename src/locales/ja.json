@@ -1,10 +1,15 @@
 {
     "normal_settings": "通常設定",
     "whisper_settings": "ウィスパー設定",
-    "about_me": "私について", 
+    "about_me": "私について",
     "toggle_theme": "テーマを切り替える",
     "theme": "テーマ",
     "light_theme": "ライトテーマ",
     "dark_theme": "ダークテーマ",
-    "language": "言語"
+    "language": "言語",
+    "ffmpeg_load": "FFmpegパッケージのインポート",
+    "whisper_load": "Whisperモデルのインポート",
+    "compute_mode": "計算モード",
+    "whisper_prompt": "Whisperプロンプト",
+    "whisper_prompt_placeholder": "Whisperプロンプトを入力してください"
 }
