@@ -1,5 +1,10 @@
 {
     "normal_settings": "Normal Settings",
     "whisper_settings": "Whisper Settings",
-    "about_me": "About Me"
+    "about_me": "About Me",
+    "toggle_theme": "Toggle Theme",
+    "theme": "Theme",
+    "light_theme": "Light Theme",
+    "dark_theme": "Dark Theme",
+    "language": "Language"
 }

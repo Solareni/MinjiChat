@@ -1,5 +1,10 @@
 {
     "normal_settings": "普通设置",
     "whisper_settings": "耳语设置",
-    "about_me": "关于我们"
+    "about_me": "关于我们",
+    "toggle_theme": "切换主题",
+    "theme": "主题",
+    "light_theme": "浅色主题",
+    "dark_theme": "深色主题",
+    "language": "语言"
 }
