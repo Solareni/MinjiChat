@@ -3,7 +3,8 @@ import Whipser from "./components/Whisper";
 import Settings from "./components/Settings";
 import Layout from "./Layout";
 import WhisperSettings from "./components/Settings/WhisperSettings";
-import About from "./components/Settings/About";
+import AboutMe from "./components/Settings/AboutMe";
+import NormalSettings from "./components/Settings/NormalSettings";
 
 const NewConversation = () => {
   return (
@@ -54,12 +55,16 @@ export const router = createBrowserRouter([
         element: <Settings />,
         children: [
           {
+            path: "normal_settings",
+            element: <NormalSettings />,
+          },
+          {
             path: "whisper_settings",
             element: <WhisperSettings />,
           },
           {
-            path: "about",
-            element: <About />,
+            path: "about_me",
+            element: <AboutMe />,
           },
         ],
       },

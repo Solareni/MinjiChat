@@ -12,7 +12,6 @@ import {
 } from "./SidebarItems";
 import { router } from "../router";
 
-
 const getIcon = (path: string) => {
   switch (path) {
     case "logo":
@@ -34,30 +33,31 @@ const getIcon = (path: string) => {
     default:
       return <LogoIcon />;
   }
-}
+};
 
 const Sidebar = () => {
   const sidebars = router.routes[0].children;
   return (
     <div className="flex h-screen w-12 flex-col items-center bg-background border-r border-border p-2 sm:w-16">
-      {sidebars && sidebars
-        .map((route) => {
+      {sidebars &&
+        sidebars.map((route) => {
           const path = route.path!;
           return (
-          <NavLink
-            key={path}
-            to={path}
-            className={({ isActive }) =>
-              `w-8 h-8 flex items-center justify-center rounded-full transition-colors mb-8 ${
-                isActive
-                  ? "bg-gray-200/50 dark:bg-gray-700/50"
-                  : "hover:bg-gray-100/50 dark:hover:bg-gray-800/50"
-              }`
-            }
-          >
-           {getIcon(path)}
-          </NavLink>
-        )})}
+            <NavLink
+              key={path}
+              to={path}
+              className={({ isActive }) =>
+                `w-8 h-8 flex items-center justify-center rounded-full transition-colors mb-8 ${
+                  isActive
+                    ? "bg-gray-200/50 dark:bg-gray-700/50"
+                    : "hover:bg-gray-100/50 dark:hover:bg-gray-800/50"
+                }`
+              }
+            >
+              {getIcon(path)}
+            </NavLink>
+          );
+        })}
     </div>
   );
 };
