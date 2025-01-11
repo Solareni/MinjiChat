@@ -229,3 +229,76 @@ export const ThemeToggle = () => {
     />
   );
 };
+
+
+export const ActionIcon = () => {
+	return (
+		<svg
+			width="1em"
+			height="1em"
+			viewBox="0 0 24 24"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+			data-icon="MoreOutlined"
+		>
+			<path
+				d="M5.5 11.75a1.75 1.75 0 1 1-3.5 0 1.75 1.75 0 0 1 3.5 0Zm8.225 0a1.75 1.75 0 1 1-3.5 0 1.75 1.75 0 0 1 3.5 0Zm8.275 0a1.75 1.75 0 1 1-3.5 0 1.75 1.75 0 0 1 3.5 0Z"
+				fill="currentColor"
+			></path>
+		</svg>
+	);
+};
+export const ContentIcon = () => {
+	return (
+		<svg
+			width="120"
+			height="68"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+			xmlnsXlink="http://www.w3.org/1999/xlink"
+		>
+			<path d="M120 0H0v68h120V0z" fill="url(#paint0_linear)" />
+			<path fill="url(#pattern0)" d="M34 9h56v53H34z" />
+			<path
+				d="M75 33c0-7-6-12-12-12h-6c-6 0-12 5-12 12v11c0 2 1 3 3 3h1c3 0 5-2 5-5v-2c0-2-2-5-5-5h-1v-2c0-5 4-9 9-9h6c5 0 9 4 9 9v2h-1c-3 0-5 3-5 5v2c0 3 2 5 5 5h1c2 0 3-1 3-3V33z"
+				fill="url(#paint1_linear)"
+			/>
+			<defs>
+				<linearGradient
+					id="paint0_linear"
+					x1="121.2"
+					y1="34"
+					x2="-.9"
+					y2="34"
+					gradientUnits="userSpaceOnUse"
+				>
+					<stop stop-color="#71D6F7" />
+					<stop offset="1" stop-color="#8BEDF2" />
+				</linearGradient>
+				<linearGradient
+					id="paint1_linear"
+					x1="45"
+					y1="34"
+					x2="75"
+					y2="34"
+					gradientUnits="userSpaceOnUse"
+				>
+					<stop stop-color="#fff" />
+					<stop offset="1" stop-color="#C8FAFC" />
+				</linearGradient>
+				<pattern
+					id="pattern0"
+					patternContentUnits="objectBoundingBox"
+					width="1"
+					height="1"
+				>
+					<use xlinkHref="#image0" />
+				</pattern>
+				<image
+					id="image0"
+					xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADkAAAA2CAYAAAB9TjFQAAAACXBIWXMAAAsSAAALEgHS3X78AAAA"
+				/>
+			</defs>
+		</svg>
+	);
+};

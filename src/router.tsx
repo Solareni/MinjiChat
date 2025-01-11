@@ -1,5 +1,5 @@
 import { createBrowserRouter } from "react-router-dom";
-import Whipser from "./components/Whisper";
+import Whispser from "./components/Whisper";
 import Settings from "./components/Settings";
 import Layout from "./Layout";
 import WhisperSettings from "./components/Settings/WhisperSettings";
@@ -47,7 +47,7 @@ export const router = createBrowserRouter([
       { path: "new_conversation", element: <NewConversation /> },
       { path: "conversations", element: <Conversations /> },
       { path: "discover", element: <Discover /> },
-      { path: "whisper", element: <Whipser /> },
+      { path: "whisper", element: <Whispser /> },
       { path: "user", element: <User /> },
       { path: "theme", element: <div /> },
       {
