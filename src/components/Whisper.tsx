@@ -86,34 +86,58 @@ const Whispser = () => {
 					</div>
 				)}
 			</div>
+			{
+				!showClearButton ? (
+					<div>
+						<div className="flex items-center justify-between mb-8">
+							<span className="font-medium">我的内容</span>
+							<button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+								上传
+							</button>
+						</div>
+						{/* 表头 */}
+						<div className="grid grid-cols-[2fr_1fr_100px] items-center mb-2">
+							<span className="font-medium">文件</span>
+							<span className="font-medium">创建时间</span>
+							<span className="font-medium text-right">操作</span>
+						</div>
 
-			<div className="flex items-center justify-between mb-8">
-				<span className="font-medium">我的内容</span>
-				<button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-					上传
-				</button>
-			</div>
-			{/* 表头 */}
-			<div className="grid grid-cols-[2fr_1fr_100px] items-center mb-2">
-				<span className="font-medium">文件</span>
-				<span className="font-medium">创建时间</span>
-				<span className="font-medium text-right">操作</span>
-			</div>
+						{/* 分割线 */}
+						<hr className="mb-4" />
 
-			{/* 分割线 */}
-			<hr className="mb-4" />
+						{/* 虚拟列表区域 */}
+						<div className="h-[600px]">
+							<FixedSizeList
+								height={600}
+								itemCount={whisperData.length}
+								itemSize={80}
+								width="100%"
+							>
+								{({ index, style }) => <ListItem index={index} style={style} />}
+							</FixedSizeList>
+						</div>
+					</div>
+				) : (<div>
+					<div className="flex items-center justify-between mb-8">
+						<span className="font-medium">共1个与yes相关的结果</span>
 
-			{/* 虚拟列表区域 */}
-			<div className="h-[600px]">
-				<FixedSizeList
-					height={600}
-					itemCount={whisperData.length}
-					itemSize={80}
-					width="100%"
-				>
-					{({ index, style }) => <ListItem index={index} style={style} />}
-				</FixedSizeList>
-			</div>
+					</div>
+					{/* 分割线 */}
+					<hr className="mb-4" />
+
+					{/* 这里是一个列表，该列表是由几部分组成，
+						1 第一行是音频的文件名
+						2 第二行是创建时间和时长
+						3 分割行
+						4 一行“文字记录”
+						5 最多三行，表示从文件中找到的关键字记录
+						6 <span>&nbsp;...&nbsp;</span> 有一个点击时间，可以跳转到对应的WhisperDetail页面中
+					*/}
+
+				</div>)
+			}
+
+
 		</div>
 	);
 };
