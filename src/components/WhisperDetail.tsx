@@ -1,27 +1,14 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { CaptionBackIcon, ActionIcon } from "./SidebarItems";
 import { VariableSizeList as List } from "react-window";
-import speaker1 from "../assets/1.png"
+import speaker1 from "../assets/1.png";
 import React, {
 	useState,
 	useRef,
 	useCallback,
 	useEffect,
-	useMemo,
 } from "react";
 import { generateData } from "../mock";
-
-const resizeObserver = new ResizeObserver((entries) => {
-	entries.forEach((entry) => {
-		const target = entry.target as HTMLElement;
-		const index = target.dataset.index;
-		const onResize = target.dataset.onResize;
-		if (index && onResize) {
-			const height = target.getBoundingClientRect().height;
-			(window as any)[onResize](parseInt(index), height);
-		}
-	});
-});
 
 interface MessageProps {
 	content: string;
@@ -38,7 +25,9 @@ const MessageTime = React.memo(
 					alt="Avatar"
 					className="h-5 w-5 rounded-full"
 				/>
-				<span className="ml-2">{start}s - {end}s</span>
+				<span className="ml-2">
+					{start}s - {end}s
+				</span>
 			</div>
 		);
 	}
@@ -86,75 +75,30 @@ const Row = ({
 	style: React.CSSProperties;
 	data: ItemData;
 }) => {
-	const message = data.items[index];
+	const item = data.items[index];
 	const rowRef = useRef<HTMLDivElement>(null);
-	const callbackName = `updateHeight_${index}`;
-
-	const updateRowHeight = useCallback(() => {
-		if (rowRef.current) {
-			const height = rowRef.current.getBoundingClientRect().height;
-			data.setSize(index, height);
-		}
-	}, [data.setSize, index]);
-
-	useEffect(() => {
-		(window as any)[callbackName] = updateRowHeight;
-		return () => {
-			delete (window as any)[callbackName];
-		};
-	}, [callbackName, updateRowHeight]);
+	const [height, setHeight] = useState(70); // 默认高度
 
 	useEffect(() => {
 		if (rowRef.current) {
-			rowRef.current.dataset.index = index.toString();
-			rowRef.current.dataset.onResize = callbackName;
-			resizeObserver.observe(rowRef.current);
-		}
-		return () => {
-			if (rowRef.current) {
-				resizeObserver.unobserve(rowRef.current);
+			const newHeight = rowRef.current.getBoundingClientRect().height;
+			if (newHeight !== height) {
+				setHeight(newHeight);
+				data.setSize(index, newHeight);
 			}
-		};
-	}, [callbackName, index]);
-
-	useEffect(() => {
-		if (rowRef.current) {
-			const timer = setTimeout(() => {
-				updateRowHeight();
-			}, 0);
-			return () => {
-				clearTimeout(timer);
-			};
 		}
-	}, []);
+	}, [item.content]); // 当内容变化时重新计算高度
 
-	useEffect(() => {
-		updateRowHeight();
-	}, [message.content, updateRowHeight]);
 	return (
-		<div
-			ref={rowRef}
-			style={{
-				...style,
-				height: "auto",
-				position: "absolute",
-				top: style.top,
-				left: 0,
-				width: "100%",
-				transform: "translateY(0)",
-				margin: 0,
-				padding: 0,
-				borderTop: "none",
-				borderBottom: "none",
-			}}
-			className="border-0"
-		>
-			<Message
-				content={message.content}
-				start={message.start}
-				end={message.end}
-				searchKeyworkd={data.searchKeyword}
-			/>
+		<div style={style}>
+			<div ref={rowRef}>
+				<Message
+					content={item.content}
+					start={item.start}
+					end={item.end}
+					searchKeyworkd={data.searchKeyword}
+				/>
+			</div>
 		</div>
 	);
 };
@@ -170,20 +114,15 @@ export const WhisperDetail = () => {
 	const [searchKeyword, setSearchKeyword] = useState<string>();
 	const [searchItems, setSearchItems] = useState<any[]>([]);
 	const [searchIndex, setSearchIndex] = useState(0);
-	const sizeMap = useRef<number[]>([]);
-	// 动态计算行高
+	const sizeMap = useRef<{ [key: number]: number }>({});
+
 	const getSize = useCallback((index: number) => {
 		return sizeMap.current[index] || 70;
 	}, []);
 
 	const setSize = useCallback((index: number, size: number) => {
-		const oldSize = sizeMap.current[index];
-		if (oldSize !== size) {
-			sizeMap.current[index] = size;
-			if (listRef.current) {
-				listRef.current.resetAfterIndex(index);
-			}
-		}
+		sizeMap.current[index] = size;
+		listRef.current?.resetAfterIndex(index);
 	}, []);
 
 	useEffect(() => {
@@ -229,16 +168,6 @@ export const WhisperDetail = () => {
 		};
 	}, [searchItems, searchIndex]);
 
-	const itemData = useMemo(
-		() => ({
-			items: message,
-			listRef,
-			setSize,
-			searchKeyword: searchKeyword ?? undefined,
-		}),
-		[message, setSize, searchKeyword, searchItems, searchIndex]
-	);
-
 	const navigate = useNavigate();
 	return (
 		<div className="flex flex-col h-screen p-4 dark:text-white text-black animate-fade-in">
@@ -278,7 +207,11 @@ export const WhisperDetail = () => {
 					itemCount={message.length}
 					itemSize={getSize}
 					width="100%"
-					itemData={itemData}
+					itemData={{
+						items: message,
+						setSize,
+						searchKeyword: searchKeyword ?? undefined,
+					}}
 					overscanCount={5}
 				>
 					{Row}
