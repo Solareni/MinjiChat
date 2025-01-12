@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { CaptionBackIcon, ActionIcon } from "./SidebarItems";
 import { VariableSizeList as List } from "react-window";
 import React, {
@@ -83,7 +83,11 @@ const Message = React.memo(
 		);
 	}
 );
-
+interface ItemData {
+	items: any[];
+	setSize: (index: number, size: number) => void;
+	searchKeyword?: string;
+}
 const Row = ({
 	index,
 	style,
@@ -91,11 +95,7 @@ const Row = ({
 }: {
 	index: number;
 	style: React.CSSProperties;
-	data: {
-		items: any[];
-		setSize: (index: number, size: number) => void;
-		searchKeyword?: string;
-	};
+	data: ItemData;
 }) => {
 	const message = data.items[index];
 	const rowRef = useRef<HTMLDivElement>(null);
@@ -250,11 +250,14 @@ export const WhisperDetail = () => {
 		[message, setSize, searchKeyword, searchItems, searchIndex]
 	);
 
+	const navigate = useNavigate();
 	return (
 		<div className="flex flex-col h-screen p-4 dark:text-white text-black animate-fade-in">
 			{/* 头部 */}
 			<div className="flex items-center mb-4">
-				<CaptionBackIcon />
+				<button onClick={() => navigate(-1)}>
+					<CaptionBackIcon />
+				</button>
 				<div className="ml-4">
 					<h1 className="text-2xl font-bold">Whisper {id}</h1>
 					<p className="text-sm text-gray-500">创建时间: 2023-10-01 12:00:00</p>
