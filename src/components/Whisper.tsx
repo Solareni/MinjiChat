@@ -9,6 +9,11 @@ interface ListItemProps {
 	style: React.CSSProperties;
 }
 
+interface SearchResultItemProps {
+	index: number;
+	style: React.CSSProperties;
+}
+
 const ListItem = ({ index, style }: ListItemProps) => {
 	return (
 		<Link to={`/whisper/${index + 1}`} style={style} className="block">
@@ -33,25 +38,88 @@ const ListItem = ({ index, style }: ListItemProps) => {
 		</Link>
 	);
 };
+
+const SearchResultItem = ({ index, style }: SearchResultItemProps) => {
+	const result = searchResults[index];
+	return (
+		<div style={style} className="space-y-4">
+			{/* 文件信息 */}
+			<div className="flex items-center gap-4">
+				<div>
+					<div className="font-medium">{result.fileName}</div>
+					<div className="text-sm text-gray-500">
+						{result.createdAt} · {result.duration}
+					</div>
+				</div>
+			</div>
+
+			{/* 文字记录 */}
+			<div className="space-y-2">
+				<div className="font-medium">文字记录</div>
+				{result.transcriptSnippets.slice(0, 3).map((snippet, i) => (
+					<div key={i} className="text-sm text-gray-600">
+						{snippet}
+					</div>
+				))}
+			</div>
+
+			{/* 跳转链接 */}
+			<Link
+				to={`/whisper/${result.id}`}
+				className="text-sm text-blue-500 hover:text-blue-700"
+			>
+				查看完整记录
+			</Link>
+			{/* 分割线 */}
+			<hr className="mb-4" />
+		</div>
+	);
+};
+
 const whisperData: WhisperItem[] = Array.from({ length: 100 }, (_, i) => ({
 	id: i + 1,
 	fileName: `文件名 ${i + 1}`,
 	duration: "00:30",
 	createdAt: "2023-10-01",
 }));
+
+interface SearchResult {
+	id: number;
+	fileName: string;
+	duration: string;
+	createdAt: string;
+	transcriptSnippets: string[];
+}
+
+const searchResults: SearchResult[] = Array.from({ length: 10 }, (_, i) => ({
+	id: i + 1,
+	fileName: `搜索结果 ${i + 1}`,
+	duration: "00:30",
+	createdAt: "2023-10-01",
+	transcriptSnippets: [
+		"这是第一个匹配的文本片段这是第一个匹配的文本片段这是第一个匹配的文本片段这是第一个匹配的文本片段这是第一个匹配的文本片段这是第一个匹配的文本片段这是第一个匹配的文本片段这是第一个匹配的文本片段这是第一个匹配的文本片段这是第一个匹配的文本片段这是第一个匹配的文本片段",
+		"这是第二个匹配的文本片段",
+		"这是第三个匹配的文本片段",
+		"这是第4个匹配的文本片段",
+	],
+}));
+
 const Whispser = () => {
 	const [searchValue, setSearchValue] = useState("");
 	const [showClearButton, setShowClearButton] = useState(false);
+	const [resultsCount, setResultsCount] = useState(0);
 
 	const handleSearch = () => {
-		// 在这里执行搜索逻辑
+		// 模拟搜索逻辑
+		const count = searchValue ? searchResults.length : 0;
+		setResultsCount(count);
 		console.log("执行搜索:", searchValue);
 	};
 
 	const handleClear = () => {
 		setSearchValue("");
 		setShowClearButton(false);
-		// 在这里执行清除后的逻辑
+		setResultsCount(0);
 		console.log("清除搜索");
 	};
 
@@ -60,6 +128,7 @@ const Whispser = () => {
 			handleSearch();
 		}
 	};
+
 	return (
 		<div className="w-full max-w-5xl mx-auto p-4">
 			{/* 搜索框 */}
@@ -86,59 +155,63 @@ const Whispser = () => {
 					</div>
 				)}
 			</div>
-			{
-				!showClearButton ? (
-					<div>
-						<div className="flex items-center justify-between mb-8">
-							<span className="font-medium">我的内容</span>
-							<button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-								上传
-							</button>
-						</div>
-						{/* 表头 */}
-						<div className="grid grid-cols-[2fr_1fr_100px] items-center mb-2">
-							<span className="font-medium">文件</span>
-							<span className="font-medium">创建时间</span>
-							<span className="font-medium text-right">操作</span>
-						</div>
-
-						{/* 分割线 */}
-						<hr className="mb-4" />
-
-						{/* 虚拟列表区域 */}
-						<div className="h-[600px]">
-							<FixedSizeList
-								height={600}
-								itemCount={whisperData.length}
-								itemSize={80}
-								width="100%"
-							>
-								{({ index, style }) => <ListItem index={index} style={style} />}
-							</FixedSizeList>
-						</div>
-					</div>
-				) : (<div>
+			{!showClearButton ? (
+				<div>
 					<div className="flex items-center justify-between mb-8">
-						<span className="font-medium">共1个与yes相关的结果</span>
+						<span className="font-medium">我的内容</span>
+						<button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+							上传
+						</button>
+					</div>
+					{/* 表头 */}
+					<div className="grid grid-cols-[2fr_1fr_100px] items-center mb-2">
+						<span className="font-medium">文件</span>
+						<span className="font-medium">创建时间</span>
+						<span className="font-medium text-right">操作</span>
+					</div>
 
+					{/* 分割线 */}
+					<hr className="mb-4" />
+
+					{/* 虚拟列表区域 */}
+					<div className="h-[600px]">
+						<FixedSizeList
+							height={600}
+							itemCount={whisperData.length}
+							itemSize={80}
+							width="100%"
+						>
+							{({ index, style }) => <ListItem index={index} style={style} />}
+						</FixedSizeList>
+					</div>
+				</div>
+			) : (
+				<div>
+					<div className="flex items-center justify-between mb-8">
+						<span className="font-medium">
+							共{resultsCount}个与"{searchValue}"相关的结果
+						</span>
 					</div>
 					{/* 分割线 */}
 					<hr className="mb-4" />
 
-					{/* 这里是一个列表，该列表是由几部分组成，
-						1 第一行是音频的文件名
-						2 第二行是创建时间和时长
-						3 分割行
-						4 一行“文字记录”
-						5 最多三行，表示从文件中找到的关键字记录
-						6 <span>&nbsp;...&nbsp;</span> 有一个点击时间，可以跳转到对应的WhisperDetail页面中
-					*/}
-
-				</div>)
-			}
-
-
+					{/* 搜索结果列表 */}
+					<div className="h-[600px]">
+						<FixedSizeList
+							height={700}
+							itemCount={resultsCount}
+							itemSize={250}
+							width="100%"
+						>
+							{({ index, style }) => (
+								<SearchResultItem index={index} style={style} />
+							)}
+						</FixedSizeList>
+					</div>
+				</div>
+			)}
 		</div>
 	);
 };
+
 export default Whispser;
