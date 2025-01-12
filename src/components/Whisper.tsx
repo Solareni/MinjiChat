@@ -1,8 +1,20 @@
-import { FixedSizeList } from "react-window";
-import { WhisperItem } from "../types";
+import { FixedSizeList, VariableSizeList as List } from "react-window";
 import { ActionIcon, ContentIcon, InputDeleteIcon } from "./SidebarItems";
 import { Link, useParams } from "react-router-dom";
-import { useState } from "react";
+import { useState, useRef, useCallback, useEffect, useMemo } from "react";
+import { searchResults, whisperData } from "../mock";
+
+const resizeObserver = new ResizeObserver((entries) => {
+	entries.forEach((entry) => {
+		const target = entry.target as HTMLElement;
+		const index = target.dataset.index;
+		const onResize = target.dataset.onResize;
+		if (index && onResize) {
+			const height = target.getBoundingClientRect().height;
+			(window as any)[onResize](parseInt(index), height);
+		}
+	});
+});
 
 interface ListItemProps {
 	index: number;
@@ -39,10 +51,84 @@ const ListItem = ({ index, style }: ListItemProps) => {
 	);
 };
 
-const SearchResultItem = ({ index, style }: SearchResultItemProps) => {
+interface ItemData {
+	items: any[];
+	setSize: (index: number, size: number) => void;
+}
+
+const SearchResultItem = ({
+	index,
+	style,
+	data,
+}: {
+	index: number;
+	style: React.CSSProperties;
+	data: ItemData;
+}) => {
 	const result = searchResults[index];
+	const rowRef = useRef<HTMLDivElement>(null);
+	const callbackName = `updateHeight_${index}`;
+
+	const updateRowHeight = useCallback(() => {
+		if (rowRef.current) {
+			const height = rowRef.current.getBoundingClientRect().height;
+			data.setSize(index, height);
+		}
+	}, [data.setSize, index]);
+
+	useEffect(() => {
+		(window as any)[callbackName] = updateRowHeight;
+		return () => {
+			delete (window as any)[callbackName];
+		};
+	}, [callbackName, updateRowHeight]);
+
+	useEffect(() => {
+		if (rowRef.current) {
+			rowRef.current.dataset.index = index.toString();
+			rowRef.current.dataset.onResize = callbackName;
+			resizeObserver.observe(rowRef.current);
+		}
+		return () => {
+			if (rowRef.current) {
+				resizeObserver.unobserve(rowRef.current);
+			}
+		};
+	}, [callbackName, index]);
+
+	useEffect(() => {
+		if (rowRef.current) {
+			const timer = setTimeout(() => {
+				updateRowHeight();
+			}, 0);
+			return () => {
+				clearTimeout(timer);
+			};
+		}
+	}, []);
+
+	useEffect(() => {
+		updateRowHeight();
+	}, [result.transcriptSnippets, updateRowHeight]);
+
 	return (
-		<div style={style} className="space-y-4">
+		<div
+			ref={rowRef}
+			style={{
+				...style,
+				height: "auto",
+				position: "absolute",
+				top: style.top,
+				left: 0,
+				width: "100%",
+				transform: "translateY(0)",
+				margin: 0,
+				padding: 0,
+				borderTop: "none",
+				borderBottom: "none",
+			}}
+			className="space-y-4"
+		>
 			{/* 文件信息 */}
 			<div className="flex items-center gap-4">
 				<div>
@@ -57,7 +143,15 @@ const SearchResultItem = ({ index, style }: SearchResultItemProps) => {
 			<div className="space-y-2">
 				<div className="font-medium">文字记录</div>
 				{result.transcriptSnippets.slice(0, 3).map((snippet, i) => (
-					<div key={i} className="text-sm text-gray-600">
+					<div
+						key={i}
+						className="text-sm text-gray-600 whitespace-pre-wrap break-words"
+						style={{
+							wordBreak: "break-word",
+							overflowWrap: "break-word",
+							maxWidth: "100%",
+						}}
+					>
 						{snippet}
 					</div>
 				))}
@@ -76,13 +170,6 @@ const SearchResultItem = ({ index, style }: SearchResultItemProps) => {
 	);
 };
 
-const whisperData: WhisperItem[] = Array.from({ length: 100 }, (_, i) => ({
-	id: i + 1,
-	fileName: `文件名 ${i + 1}`,
-	duration: "00:30",
-	createdAt: "2023-10-01",
-}));
-
 interface SearchResult {
 	id: number;
 	fileName: string;
@@ -91,23 +178,34 @@ interface SearchResult {
 	transcriptSnippets: string[];
 }
 
-const searchResults: SearchResult[] = Array.from({ length: 10 }, (_, i) => ({
-	id: i + 1,
-	fileName: `搜索结果 ${i + 1}`,
-	duration: "00:30",
-	createdAt: "2023-10-01",
-	transcriptSnippets: [
-		"这是第一个匹配的文本片段这是第一个匹配的文本片段这是第一个匹配的文本片段这是第一个匹配的文本片段这是第一个匹配的文本片段这是第一个匹配的文本片段这是第一个匹配的文本片段这是第一个匹配的文本片段这是第一个匹配的文本片段这是第一个匹配的文本片段这是第一个匹配的文本片段",
-		"这是第二个匹配的文本片段",
-		"这是第三个匹配的文本片段",
-		"这是第4个匹配的文本片段",
-	],
-}));
-
 const Whispser = () => {
 	const [searchValue, setSearchValue] = useState("");
 	const [showClearButton, setShowClearButton] = useState(false);
 	const [resultsCount, setResultsCount] = useState(0);
+	const listRef = useRef<any>(null);
+	const sizeMap = useRef<number[]>([]);
+
+	const getSize = useCallback((index: number) => {
+		return sizeMap.current[index] || 250;
+	}, []);
+
+	const setSize = useCallback((index: number, size: number) => {
+		const oldSize = sizeMap.current[index];
+		if (oldSize !== size) {
+			sizeMap.current[index] = size;
+			if (listRef.current) {
+				listRef.current.resetAfterIndex(index);
+			}
+		}
+	}, []);
+
+	const itemData = useMemo(
+		() => ({
+			items: searchResults,
+			setSize,
+		}),
+		[setSize]
+	);
 
 	const handleSearch = () => {
 		// 模拟搜索逻辑
@@ -197,16 +295,16 @@ const Whispser = () => {
 
 					{/* 搜索结果列表 */}
 					<div className="h-[600px]">
-						<FixedSizeList
+						<List
+							ref={listRef}
 							height={700}
 							itemCount={resultsCount}
-							itemSize={250}
+							itemSize={getSize}
 							width="100%"
+							itemData={itemData}
 						>
-							{({ index, style }) => (
-								<SearchResultItem index={index} style={style} />
-							)}
-						</FixedSizeList>
+							{SearchResultItem}
+						</List>
 					</div>
 				</div>
 			)}
