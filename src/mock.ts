@@ -10,16 +10,18 @@ export const whisperData = Array.from({ length: 100 }, (_, i) => ({
 	duration: "00:30",
 	createdAt: "2023-10-01",
 }));
-export const searchResults = Array.from({ length: 10 }, (_, i) => ({
-    id: i + 1,
-    fileName: `搜索结果 ${i + 1}`,
-    duration: "00:30",
-    createdAt: "2023-10-01",
-    transcriptSnippets: Array.from({ length: 4 }, () => {
-        const snippetLength = Math.floor(Math.random() * 500) + 200; // 生成50-250长度的随机数
-        return generateRandomString(snippetLength);
-    }),
-}));
+export const generateSearchResults = () => {
+	return Array.from({ length: 10 }, (_, i) => ({
+		id: i + 1,
+		fileName: `搜索结果 ${i + 1}`,
+		duration: "00:30",
+		createdAt: "2023-10-01",
+		transcriptSnippets: Array.from({ length: 4 }, () => {
+			const snippetLength = Math.floor(Math.random() * 500) + 200; // 生成50-250长度的随机数
+			return generateRandomString(snippetLength);
+		}),
+	}));
+};
 
 
 // 生成对话数据

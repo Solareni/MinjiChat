@@ -2,7 +2,7 @@ import { FixedSizeList, VariableSizeList as List } from "react-window";
 import { ActionIcon, ContentIcon, InputDeleteIcon } from "./SidebarItems";
 import { Link, useParams } from "react-router-dom";
 import { useState, useRef, useCallback, useEffect, useMemo } from "react";
-import { searchResults, whisperData } from "../mock";
+import { generateSearchResults, whisperData } from "../mock";
 
 const resizeObserver = new ResizeObserver((entries) => {
 	entries.forEach((entry) => {
@@ -17,11 +17,6 @@ const resizeObserver = new ResizeObserver((entries) => {
 });
 
 interface ListItemProps {
-	index: number;
-	style: React.CSSProperties;
-}
-
-interface SearchResultItemProps {
 	index: number;
 	style: React.CSSProperties;
 }
@@ -52,7 +47,7 @@ const ListItem = ({ index, style }: ListItemProps) => {
 };
 
 interface ItemData {
-	items: any[];
+	items: SearchResult[];
 	setSize: (index: number, size: number) => void;
 }
 
@@ -65,7 +60,7 @@ const SearchResultItem = ({
 	style: React.CSSProperties;
 	data: ItemData;
 }) => {
-	const result = searchResults[index];
+	const result = data.items[index];
 	const rowRef = useRef<HTMLDivElement>(null);
 	const callbackName = `updateHeight_${index}`;
 
@@ -182,6 +177,7 @@ const Whispser = () => {
 	const [searchValue, setSearchValue] = useState("");
 	const [showClearButton, setShowClearButton] = useState(false);
 	const [resultsCount, setResultsCount] = useState(0);
+	const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
 	const listRef = useRef<any>(null);
 	const sizeMap = useRef<number[]>([]);
 
@@ -199,17 +195,26 @@ const Whispser = () => {
 		}
 	}, []);
 
-	const itemData = useMemo(
-		() => ({
-			items: searchResults,
-			setSize,
-		}),
-		[setSize]
-	);
+	// const itemData = useMemo(
+	// 	() => ({
+	// 		items: searchResults,
+	// 		setSize,
+	// 	}),
+	// 	[setSize]
+	// );
 
 	const handleSearch = () => {
+		// 清空之前的结果
+		sizeMap.current = [];
+		if (listRef.current) {
+			listRef.current.resetAfterIndex(0);
+		}
+
+		const newResults = generateSearchResults();
+		setSearchResults(newResults);
+		
 		// 模拟搜索逻辑
-		const count = searchValue ? searchResults.length : 0;
+		const count = searchValue ? newResults.length : 0;
 		setResultsCount(count);
 		console.log("执行搜索:", searchValue);
 	};
@@ -301,7 +306,10 @@ const Whispser = () => {
 							itemCount={resultsCount}
 							itemSize={getSize}
 							width="100%"
-							itemData={itemData}
+							itemData={{
+								items: searchResults,
+								setSize,
+							}}
 						>
 							{SearchResultItem}
 						</List>
