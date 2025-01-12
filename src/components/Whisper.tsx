@@ -4,18 +4,6 @@ import { Link, useParams } from "react-router-dom";
 import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { generateSearchResults, whisperData } from "../mock";
 
-const resizeObserver = new ResizeObserver((entries) => {
-	entries.forEach((entry) => {
-		const target = entry.target as HTMLElement;
-		const index = target.dataset.index;
-		const onResize = target.dataset.onResize;
-		if (index && onResize) {
-			const height = target.getBoundingClientRect().height;
-			(window as any)[onResize](parseInt(index), height);
-		}
-	});
-});
-
 interface ListItemProps {
 	index: number;
 	style: React.CSSProperties;
@@ -62,105 +50,55 @@ const SearchResultItem = ({
 }) => {
 	const result = data.items[index];
 	const rowRef = useRef<HTMLDivElement>(null);
-	const callbackName = `updateHeight_${index}`;
-
-	const updateRowHeight = useCallback(() => {
-		if (rowRef.current) {
-			const height = rowRef.current.getBoundingClientRect().height;
-			data.setSize(index, height);
-		}
-	}, [data.setSize, index]);
-
-	useEffect(() => {
-		(window as any)[callbackName] = updateRowHeight;
-		return () => {
-			delete (window as any)[callbackName];
-		};
-	}, [callbackName, updateRowHeight]);
 
 	useEffect(() => {
 		if (rowRef.current) {
-			rowRef.current.dataset.index = index.toString();
-			rowRef.current.dataset.onResize = callbackName;
-			resizeObserver.observe(rowRef.current);
+			const newHeight = rowRef.current.getBoundingClientRect().height;
+			data.setSize(index, newHeight);
 		}
-		return () => {
-			if (rowRef.current) {
-				resizeObserver.unobserve(rowRef.current);
-			}
-		};
-	}, [callbackName, index]);
-
-	useEffect(() => {
-		if (rowRef.current) {
-			const timer = setTimeout(() => {
-				updateRowHeight();
-			}, 0);
-			return () => {
-				clearTimeout(timer);
-			};
-		}
-	}, []);
-
-	useEffect(() => {
-		updateRowHeight();
-	}, [result.transcriptSnippets, updateRowHeight]);
+	}, [result.transcriptSnippets]); // 当内容变化时重新计算高度
 
 	return (
-		<div
-			ref={rowRef}
-			style={{
-				...style,
-				height: "auto",
-				position: "absolute",
-				top: style.top,
-				left: 0,
-				width: "100%",
-				transform: "translateY(0)",
-				margin: 0,
-				padding: 0,
-				borderTop: "none",
-				borderBottom: "none",
-			}}
-			className="space-y-4"
-		>
-			{/* 文件信息 */}
-			<div className="flex items-center gap-4">
-				<div>
-					<div className="font-medium">{result.fileName}</div>
-					<div className="text-sm text-gray-500">
-						{result.createdAt} · {result.duration}
+		<div style={{ ...style, height: "auto" }}>
+			<div ref={rowRef} className="space-y-4">
+				{/* 文件信息 */}
+				<div className="flex items-center gap-4">
+					<div>
+						<div className="font-medium">{result.fileName}</div>
+						<div className="text-sm text-gray-500">
+							{result.createdAt} · {result.duration}
+						</div>
 					</div>
 				</div>
-			</div>
 
-			{/* 文字记录 */}
-			<div className="space-y-2">
-				<div className="font-medium">文字记录</div>
-				{result.transcriptSnippets.slice(0, 3).map((snippet, i) => (
-					<div
-						key={i}
-						className="text-sm text-gray-600 whitespace-pre-wrap break-words"
-						style={{
-							wordBreak: "break-word",
-							overflowWrap: "break-word",
-							maxWidth: "100%",
-						}}
-					>
-						{snippet}
-					</div>
-				))}
-			</div>
+				{/* 文字记录 */}
+				<div className="space-y-2">
+					<div className="font-medium">文字记录</div>
+					{result.transcriptSnippets.slice(0, 3).map((snippet, i) => (
+						<div
+							key={i}
+							className="text-sm text-gray-600 whitespace-pre-wrap break-words"
+							style={{
+								wordBreak: "break-word",
+								overflowWrap: "break-word",
+								maxWidth: "100%",
+							}}
+						>
+							{snippet}
+						</div>
+					))}
+				</div>
 
-			{/* 跳转链接 */}
-			<Link
-				to={`/whisper/${result.id}`}
-				className="text-sm text-blue-500 hover:text-blue-700"
-			>
-				查看完整记录
-			</Link>
-			{/* 分割线 */}
-			<hr className="mb-4" />
+				{/* 跳转链接 */}
+				<Link
+					to={`/whisper/${result.id}`}
+					className="text-sm text-blue-500 hover:text-blue-700"
+				>
+					查看完整记录
+				</Link>
+				{/* 分割线 */}
+				<hr className="mb-4" />
+			</div>
 		</div>
 	);
 };
@@ -179,29 +117,18 @@ const Whispser = () => {
 	const [resultsCount, setResultsCount] = useState(0);
 	const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
 	const listRef = useRef<any>(null);
-	const sizeMap = useRef<number[]>([]);
+	const sizeMap = useRef<{ [key: number]: number }>({});
 
 	const getSize = useCallback((index: number) => {
 		return sizeMap.current[index] || 250;
 	}, []);
 
 	const setSize = useCallback((index: number, size: number) => {
-		const oldSize = sizeMap.current[index];
-		if (oldSize !== size) {
+		if (sizeMap.current[index] !== size) {
 			sizeMap.current[index] = size;
-			if (listRef.current) {
-				listRef.current.resetAfterIndex(index);
-			}
+			listRef.current?.resetAfterIndex(index);
 		}
 	}, []);
-
-	// const itemData = useMemo(
-	// 	() => ({
-	// 		items: searchResults,
-	// 		setSize,
-	// 	}),
-	// 	[setSize]
-	// );
 
 	const handleSearch = () => {
 		// 清空之前的结果
@@ -212,7 +139,7 @@ const Whispser = () => {
 
 		const newResults = generateSearchResults();
 		setSearchResults(newResults);
-		
+
 		// 模拟搜索逻辑
 		const count = searchValue ? newResults.length : 0;
 		setResultsCount(count);

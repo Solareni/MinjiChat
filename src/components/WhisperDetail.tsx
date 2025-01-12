@@ -2,12 +2,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { CaptionBackIcon, ActionIcon } from "./SidebarItems";
 import { VariableSizeList as List } from "react-window";
 import speaker1 from "../assets/1.png";
-import React, {
-	useState,
-	useRef,
-	useCallback,
-	useEffect,
-} from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
 import { generateData } from "../mock";
 
 interface MessageProps {
@@ -77,15 +72,11 @@ const Row = ({
 }) => {
 	const item = data.items[index];
 	const rowRef = useRef<HTMLDivElement>(null);
-	const [height, setHeight] = useState(70); // 默认高度
 
 	useEffect(() => {
 		if (rowRef.current) {
 			const newHeight = rowRef.current.getBoundingClientRect().height;
-			if (newHeight !== height) {
-				setHeight(newHeight);
-				data.setSize(index, newHeight);
-			}
+			data.setSize(index, newHeight);
 		}
 	}, [item.content]); // 当内容变化时重新计算高度
 
