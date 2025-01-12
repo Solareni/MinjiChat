@@ -80,6 +80,27 @@ const Row = ({
 		}
 	}, [item.content]); // 当内容变化时重新计算高度
 
+	const updateSize = useCallback(() => {
+		if (rowRef.current) {
+			const newHeight = rowRef.current.getBoundingClientRect().height;
+			data.setSize(index, newHeight);
+		}
+	}, [index, data]);
+
+	useEffect(() => {
+		updateSize();
+	}, [item.content]); // 当内容变化时重新计算高度
+
+	useEffect(() => {
+		const handleResize = () => {
+			updateSize();
+		};
+		window.addEventListener("resize", handleResize);
+		return () => {
+			window.removeEventListener("resize", handleResize);
+		};
+	}, [updateSize]);
+
 	return (
 		<div style={style}>
 			<div ref={rowRef}>
