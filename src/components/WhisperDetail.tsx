@@ -1,6 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { CaptionBackIcon, ActionIcon } from "./SidebarItems";
 import { VariableSizeList as List } from "react-window";
+import speaker1 from "../assets/1.png"
 import React, {
 	useState,
 	useRef,
@@ -48,8 +49,13 @@ interface MessageProps {
 const MessageTime = React.memo(
 	({ start, end }: { start: number; end: number }) => {
 		return (
-			<div className="absolute -top-4 left-0 text-xs text-slate-500 whitespace-nowrap">
-				{start}s - {end}s
+			<div className="absolute -top-4 left-0 text-xs text-slate-500 whitespace-nowrap flex items-center">
+				<img
+					src={speaker1} // 使用占位符图片
+					alt="Avatar"
+					className="h-5 w-5 rounded-full"
+				/>
+				<span className="ml-2">{start}s - {end}s</span>
 			</div>
 		);
 	}

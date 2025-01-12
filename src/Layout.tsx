@@ -4,7 +4,6 @@ import { Outlet } from "react-router-dom";
 
 const Layout: React.FC = () => {
   const { theme } = useTheme();
-
   return (
     <div className={theme === "light" ? "" : "dark"}>
       <div className="flex min-h-screen bg-white dark:bg-background">
