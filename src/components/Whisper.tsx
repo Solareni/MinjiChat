@@ -2,7 +2,9 @@ import { FixedSizeList, VariableSizeList as List } from "react-window";
 import { ActionIcon, ContentIcon, InputDeleteIcon } from "./SidebarItems";
 import { Link, useParams } from "react-router-dom";
 import { useState, useRef, useCallback, useEffect, useMemo } from "react";
-import { generateSearchResults, whisperData } from "../mock";
+import { generateSearchResults } from "../mock";
+import { dispatchCommand, WhisperItem } from "../types";
+import { listen } from "@tauri-apps/api/event";
 
 interface ListItemProps {
 	index: number;
@@ -129,6 +131,7 @@ const Whispser = () => {
 	const [showClearButton, setShowClearButton] = useState(false);
 	const [resultsCount, setResultsCount] = useState(0);
 	const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+	const [whisperData, setWhisperData] = useState<WhisperItem[]>([]);
 	const listRef = useRef<any>(null);
 	const sizeMap = useRef<{ [key: number]: number }>({});
 
@@ -171,6 +174,19 @@ const Whispser = () => {
 			handleSearch();
 		}
 	};
+
+	// 首次加载，读取whisperData
+
+	useEffect(() => {
+
+		listen('tauri://drag-drop', (event) => {
+			const files = event.payload;
+			console.log('drag-drop event', files);
+		});
+
+		dispatchCommand({type: "load_whisper_data"});
+
+	}, []);
 
 	return (
 		<div className="w-full max-w-5xl mx-auto p-4">

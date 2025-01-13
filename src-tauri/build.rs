@@ -50,7 +50,12 @@ fn main() {
         .expect("Failed to run cmake --build");
 
     // 复制whisper-cli到zimu_dir中
+    #[cfg(target_os = "windows")]
+    let whisper_cli = build_dir.join("bin/Release").join("whisper-cli.exe");
+    
+    #[cfg(not(target_os = "windows"))]
     let whisper_cli = build_dir.join("bin").join("whisper-cli");
+    
     let dest = extension::whisper_cli();
     println!("cargo:warning=Copying whisper-cli to {}", dest.display());
     std::fs::copy(&whisper_cli, &dest)

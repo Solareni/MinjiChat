@@ -10,5 +10,10 @@ pub fn zimu_dir() -> std::path::PathBuf {
 
 pub fn whisper_cli() -> std::path::PathBuf {
     let dir = zimu_dir();
-    dir.join("whisper-cli")
+    #[cfg(target_os = "windows")]
+    let path = dir.join("whisper-cli.exe");
+    
+    #[cfg(not(target_os = "windows"))]
+    let path = dir.join("whisper-cli");
+    path
 }
