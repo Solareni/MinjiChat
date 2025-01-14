@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { CaptionBackIcon, ActionIcon } from "./SidebarItems";
+import { CaptionBackIcon, ActionIcon } from "./SvgIcons";
 import { VariableSizeList as List } from "react-window";
 import speaker1 from "../assets/1.png";
 import React, { useState, useRef, useCallback, useEffect } from "react";

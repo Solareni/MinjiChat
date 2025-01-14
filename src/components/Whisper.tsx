@@ -1,5 +1,5 @@
 import { FixedSizeList, VariableSizeList as List } from "react-window";
-import { ActionIcon, ContentIcon, InputDeleteIcon } from "./SidebarItems";
+import { ActionIcon, ContentIcon, InputDeleteIcon } from "./SvgIcons";
 import { Link, useParams } from "react-router-dom";
 import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { generateSearchResults } from "../mock";

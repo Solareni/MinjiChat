@@ -9,7 +9,7 @@ import {
   SettingsIcon,
   ThemeToggle,
   UserIcon,
-} from "./SidebarItems";
+} from "./SvgIcons";
 import { router } from "../router";
 
 const getIcon = (path: string) => {
