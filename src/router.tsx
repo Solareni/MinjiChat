@@ -45,15 +45,11 @@ export const router = createBrowserRouter([
     element: <Layout />,
     children: [
       { path: "logo", element: <div /> },
-      { path: "new_conversation", element: <NewConversation /> },
-      { path: "conversations", element: <Conversations /> },
-      { path: "discover", element: <Discover /> },
       { path: "whisper", children:[ 
         { index: true, element: <Whispser /> },
         { path: ":id", element: <WhisperDetail /> } // 新增详情页
         ]
       },
-      { path: "user", element: <User /> },
       { path: "theme", element: <div /> },
       {
         path: "settings",

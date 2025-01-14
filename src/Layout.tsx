@@ -6,7 +6,7 @@ const Layout: React.FC = () => {
   const { theme } = useTheme();
   return (
     <div className={theme === "light" ? "" : "dark"}>
-      <div className="flex min-h-screen bg-white dark:bg-background">
+      <div className="flex min-h-screen bg-white dark:bg-background overflow-hidden">
         <Sidebar />
 
         {/* Main Content */}
