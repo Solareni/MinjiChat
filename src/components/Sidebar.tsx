@@ -36,7 +36,8 @@ const getIcon = (path: string) => {
 };
 
 const Sidebar = () => {
-  const sidebars = router.routes[0].children;
+  const sidebars = router.routes[0].children?;
+
   return (
     <div className="flex h-screen w-12 flex-col items-center bg-background border-r border-border p-2 sm:w-16">
       {sidebars &&
@@ -58,6 +59,32 @@ const Sidebar = () => {
             </NavLink>
           );
         })}
+        <div className="mt-auto">
+    <NavLink
+      to="theme"
+      className={({ isActive }) =>
+        `w-8 h-8 flex items-center justify-center rounded-full transition-colors mb-8 ${
+          isActive
+            ? "bg-gray-200/50 dark:bg-gray-700/50"
+            : "hover:bg-gray-100/50 dark:hover:bg-gray-800/50"
+        }`
+      }
+    >
+      {getIcon("theme")}
+    </NavLink>
+    <NavLink
+      to="settings"
+      className={({ isActive }) =>
+        `w-8 h-8 flex items-center justify-center rounded-full transition-colors mb-8 ${
+          isActive
+            ? "bg-gray-200/50 dark:bg-gray-700/50"
+            : "hover:bg-gray-100/50 dark:hover:bg-gray-800/50"
+        }`
+      }
+    >
+      {getIcon("settings")}
+    </NavLink>
+  </div>
     </div>
   );
 };
