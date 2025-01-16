@@ -35,13 +35,19 @@ const getIcon = (path: string) => {
   }
 };
 
-const Sidebar = () => {
-  const sidebars = router.routes[0].children?.filter(
-    (route) => route.path !== "theme" && route.path !== "settings"
+const splitArray = <T,>(arr: T[], condition: (item: T) => boolean): [T[], T[]] => {
+  return arr.reduce<[T[], T[]]>(
+    ([pass, fail], item) => {
+      condition(item) ? pass.push(item) : fail.push(item);
+      return [pass, fail];
+    },
+    [[], []]
   );
-
-  const bottom = router.routes[0].children?.filter(
-    (route) => route.path === "theme" || route.path === "settings"
+};
+const Sidebar = () => {
+  
+  const [sidebars, bottom] = splitArray(router.routes[0].children || [], (route) => 
+    route.path !== "theme" && route.path !== "settings"
   );
 
   const renderRoutes = (routes: any[]) => {
