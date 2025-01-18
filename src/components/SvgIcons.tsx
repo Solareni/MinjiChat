@@ -176,8 +176,8 @@ export const ContentIcon = () => {
           y2="34"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#71D6F7" />
-          <stop offset="1" stop-color="#8BEDF2" />
+          <stop stopColor="#71D6F7" />
+          <stop offset="1" stopColor="#8BEDF2" />
         </linearGradient>
         <linearGradient
           id="paint1_linear"
@@ -187,8 +187,8 @@ export const ContentIcon = () => {
           y2="34"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#fff" />
-          <stop offset="1" stop-color="#C8FAFC" />
+          <stop stopColor="#fff" />
+          <stop offset="1" stopColor="#C8FAFC" />
         </linearGradient>
         <pattern
           id="pattern0"

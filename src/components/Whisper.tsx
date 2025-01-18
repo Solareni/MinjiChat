@@ -19,30 +19,19 @@ const ListItem = ({ index, style, data }: ListItemProps) => {
 	const result = data.items[index];
 	return (
 		<Link to={`/whisper/${index + 1}`} style={style} className="block">
-			<div className="grid grid-cols-[2fr_1fr_100px] items-center hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-				{/* 文件信息 */}
-				<div className="flex items-center gap-4">
-					<ContentIcon />
-					<div>
-						<div className="font-medium">{result.fileName}</div>
-
-						{result.progress && result.progress < result.duration ? (
-							<div className="text-sm text-yellow-500">
-								处理了 {(result.progress / result.duration * 100).toFixed(2)}%
-							</div> // 或者 null
-						) : (
-							<div className="text-sm text-gray-500">时长{result.duration}s</div> // 或者 null
-						)}
-					</div>
-				</div>
-
+			<div className="grid grid-cols-[2fr_1fr_1fr] items-center hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+				{/* 文件名称 */}
+				<div className="text-sm">{result.fileName}</div>
+				{/* 时长/进度*/}
+				{result.progress && result.progress < result.duration ? (
+					<div className="text-sm text-yellow-500">
+						处理了 {((result.progress / result.duration) * 100).toFixed(2)}%
+					</div> // 或者 null
+				) : (
+					<div className="text-sm text-gray-500">{result.duration}s</div> // 或者 null
+				)}
 				{/* 创建时间 */}
-				<div className="text-sm text-gray-500">{result.createdAt}</div>
-
-				{/* 操作 */}
-				<div className="flex justify-end">
-					<ActionIcon />
-				</div>
+				<div className="text-sm text-gray-500 whitespace-nowrap">{result.createdAt}</div>
 			</div>
 		</Link>
 	);
@@ -267,10 +256,10 @@ const Whispser = () => {
 						</button>
 					</div>
 					{/* 表头 */}
-					<div className="grid grid-cols-[2fr_1fr_100px] items-center mb-2">
+					<div className="grid grid-cols-[2fr_1fr_1fr] items-center mb-2">
 						<span className="font-medium">文件</span>
+						<span className="font-medium">时长</span>
 						<span className="font-medium">创建时间</span>
-						<span className="font-medium text-right">操作</span>
 					</div>
 
 					{/* 分割线 */}
