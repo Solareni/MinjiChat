@@ -52,7 +52,6 @@ export interface AstaCommand {
 export async function dispatchCommand(cmd: AstaCommand) {
 	switch (cmd.type) {
 		case "load_whipser_data":
-			// load whisper data
 			const db = await DatabaseManager.getInstance();
 			const ttsDb = db.getTTSDb();
 			const result = await ttsDb.select("SELECT * FROM stt_tasks");

@@ -4,13 +4,15 @@ import { Link, useParams } from "react-router-dom";
 import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { generateSearchResults } from "../mock";
 import { dispatchCommand, WhisperItem } from "../types";
+import { listen } from "@tauri-apps/api/event";
 
 interface ListItemProps {
 	index: number;
 	style: React.CSSProperties;
+	data: WhisperItem;
 }
 
-const ListItem = ({ index, style }: ListItemProps) => {
+const ListItem = ({ index, style , data}: ListItemProps) => {
 	return (
 		<Link to={`/whisper/${index + 1}`} style={style} className="block">
 			<div className="grid grid-cols-[2fr_1fr_100px] items-center hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
@@ -18,13 +20,13 @@ const ListItem = ({ index, style }: ListItemProps) => {
 				<div className="flex items-center gap-4">
 					<ContentIcon />
 					<div>
-						<div className="font-medium">文件名 {index}</div>
-						<div className="text-sm text-gray-500">00:30</div>
+						<div className="font-medium">{data.fileName}</div>
+						<div className="text-sm text-gray-500">{data.duration}</div>
 					</div>
 				</div>
 
 				{/* 创建时间 */}
-				<div className="text-sm text-gray-500">2023-10-01</div>
+				<div className="text-sm text-gray-500">{data.createdAt}</div>
 
 				{/* 操作 */}
 				<div className="flex justify-end">
@@ -177,8 +179,30 @@ const Whispser = () => {
 	// 首次加载，读取whisperData
 
 	useEffect(() => {
+		const unsubscribe = listen<string>("emit_event", (event) => {
+			const payload = JSON.parse(event.payload);
+			switch (payload.type) {
+				case "begin_stt_task":{
+					const data = payload.event;
+					setWhisperData((prevData) => [data, ...prevData]);
+					break;
+			}
+				case "stt_task_progress":{
+					const data = payload.event;
+					console.log(`任务进度 ${data.process}%`)
+					break;
+				}
+				default:{
+					console.log(`未知事件 ${event}`);
+				}
+			}
+		});
+
 		dispatchCommand({type: "load_whisper_data"});
 
+		return () => {
+			unsubscribe.then((unlisten) => unlisten());
+		}
 	}, []);
 
 	return (
@@ -233,7 +257,7 @@ const Whispser = () => {
 							itemSize={80}
 							width="100%"
 						>
-							{({ index, style }) => <ListItem index={index} style={style} />}
+							{({ index, style }) => <ListItem index={index} style={style} data={whisperData[index]} />}
 						</FixedSizeList>
 					</div>
 				</div>

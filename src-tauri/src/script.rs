@@ -20,6 +20,13 @@ pub fn divide_audio(input: &str, output: &str) -> Result<()> {
     Ok(())
 }
 
+pub fn get_duration(input: &str) -> Result<f64> {
+    let reader = hound::WavReader::open(input)?;
+    let spec = reader.spec();
+    let duration = reader.duration() as f64 / spec.sample_rate as f64;
+    Ok(duration)
+}
+
 pub fn whisper_command(
     model_path: &str,
     input_path: &str,

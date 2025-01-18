@@ -554,8 +554,10 @@ checksum = "7e36cc9d416881d2e24f9a963be5fb1cd90966419ac844274161d10488b3e825"
 dependencies = [
  "android-tzdata",
  "iana-time-zone",
+ "js-sys",
  "num-traits",
  "serde",
+ "wasm-bindgen",
  "windows-targets 0.52.6",
 ]
 
@@ -1715,6 +1717,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "hound"
+version = "3.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "62adaabb884c94955b19907d60019f4e145d091c75345379e70d1ee696f7854f"
+
+[[package]]
 name = "html5ever"
 version = "0.26.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2390,10 +2398,12 @@ name = "minjichat"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "chrono",
  "cmake",
  "dirs",
  "ffmpeg-sidecar",
  "flume",
+ "hound",
  "md5",
  "rust-embed",
  "serde",
