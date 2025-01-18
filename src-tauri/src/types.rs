@@ -38,6 +38,8 @@ pub enum Event {
     STTTaskProgress(STTTaskProcess),
     #[serde(rename = "stt_task_end")]
     STTTaskEnd(STTTaskProcess),
+    #[serde(rename = "stt_task_list")]
+    STTTaskList(Vec<STTTask>),
     None,
 }
 

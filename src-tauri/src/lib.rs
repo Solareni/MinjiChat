@@ -11,9 +11,9 @@ use rust_embed::Embed;
 use serde::{Deserialize, Serialize};
 use tauri::{async_runtime::Mutex, AppHandle, Emitter, Manager};
 use tracing::info;
+mod db;
 mod extension;
 mod script;
-mod db;
 mod types;
 use types::{Command, Event, STTTask, STTTaskProcess, WhisperData};
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -41,19 +41,18 @@ pub fn run() {
             let app_handle = app.handle().clone();
 
             tauri::async_runtime::spawn(async move {
-
                 let pool = Db::new().await.unwrap();
-                
 
                 {
                     let handle = app_handle.clone();
+                    let db = pool.clone();
                     let window = app_handle.get_webview_window("main").unwrap();
                     window.on_window_event(move |event| match event {
                         tauri::WindowEvent::DragDrop(event) => match event {
                             tauri::DragDropEvent::Drop { paths, .. } => {
                                 println!("Dropped file(s): {:?}", paths);
                                 if let Some(path) = paths.first() {
-                                    let _ = exec_stt_task(path, &handle);
+                                    let _ = exec_stt_task(path, &handle, &db);
                                 }
                             }
                             _ => {}
@@ -68,10 +67,13 @@ pub fn run() {
                         match cmd {
                             Command::STTTaskProcess(path) => {
                                 let path = PathBuf::from(path);
-                                let _ = exec_stt_task(&path, &handle);
+                                let _ = exec_stt_task(&path, &handle, &pool);
                             }
                             Command::LoadWhisperData => {
-                                info!("LoadWhisperData");
+                                if let Ok(tasks) = pool.fetch_tasks().await{
+                                    let event = Event::STTTaskList(tasks);
+                                    emit_event(&event, &handle);
+                                }
                             }
                         }
                     }
@@ -110,7 +112,7 @@ struct AsyncProcState {
 #[folder = "assets"]
 struct Assets;
 
-fn exec_stt_task(path: &PathBuf, app: &AppHandle) -> Result<()> {
+fn exec_stt_task(path: &PathBuf, app: &AppHandle, db: &Db) -> Result<()> {
     let current_time = chrono::Local::now();
     let current_time = current_time.format("%Y/%m/%d %H:%M").to_string();
     let task_id = get_task_id(path);
@@ -131,7 +133,7 @@ fn exec_stt_task(path: &PathBuf, app: &AppHandle) -> Result<()> {
         created_at: current_time,
     };
     {
-        let event = Event::STTTaskBegin(stt_task);
+        let event = Event::STTTaskBegin(stt_task.clone());
         emit_event(&event, app);
     }
     // whisper
@@ -158,8 +160,10 @@ fn exec_stt_task(path: &PathBuf, app: &AppHandle) -> Result<()> {
         {
             sx.send(line).unwrap();
         }
+        whisper_process.wait().unwrap();
     });
     let app = app.clone();
+    let db = db.clone();
     tauri::async_runtime::spawn(async move {
         let mut process = STTTaskProcess {
             id: task_id.clone(),
@@ -176,6 +180,9 @@ fn exec_stt_task(path: &PathBuf, app: &AppHandle) -> Result<()> {
             process.progress = duration;
             let event = Event::STTTaskEnd(process.clone());
             emit_event(&event, &app);
+        }
+        {
+            let _ = db.insert_task(&stt_task).await;
         }
         {
             // 解析json文件

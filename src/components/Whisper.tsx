@@ -208,6 +208,11 @@ const Whispser = () => {
 					setProgress(data);
 					break;
 				}
+				case "stt_task_list":{
+					const data = payload.event;
+					setWhisperData(data);
+					break;
+				}
 				default: {
 					console.log(`未知事件 ${event}`);
 				}
