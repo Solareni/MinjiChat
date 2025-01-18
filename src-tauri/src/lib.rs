@@ -5,6 +5,7 @@ use std::{
 
 use anyhow::{Context, Result};
 use chrono::Timelike;
+use db::Db;
 use extension::zimu_dir;
 use rust_embed::Embed;
 use serde::{Deserialize, Serialize};
@@ -12,6 +13,9 @@ use tauri::{async_runtime::Mutex, AppHandle, Emitter, Manager};
 use tracing::info;
 mod extension;
 mod script;
+mod db;
+mod types;
+use types::{Command, Event, STTTask, STTTaskProcess, WhisperData};
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tracing_subscriber::fmt::init();
@@ -37,6 +41,10 @@ pub fn run() {
             let app_handle = app.handle().clone();
 
             tauri::async_runtime::spawn(async move {
+
+                let pool = Db::new().await.unwrap();
+                
+
                 {
                     let handle = app_handle.clone();
                     let window = app_handle.get_webview_window("main").unwrap();
@@ -54,11 +62,16 @@ pub fn run() {
                     });
                 }
 
+                let handle = app_handle.clone();
                 loop {
                     if let Ok(cmd) = async_proc_rx.recv_async().await {
                         match cmd {
-                            Command::STTTaskProcess(task_id) => {
-                                info!("STTTaskProcess: {}", task_id);
+                            Command::STTTaskProcess(path) => {
+                                let path = PathBuf::from(path);
+                                let _ = exec_stt_task(&path, &handle);
+                            }
+                            Command::LoadWhisperData => {
+                                info!("LoadWhisperData");
                             }
                         }
                     }
@@ -73,40 +86,6 @@ pub fn run() {
         .expect("error while running tauri application");
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(tag = "type", content = "command")]
-pub enum Command {
-    #[serde(rename = "stt_task_process")]
-    STTTaskProcess(String),
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(tag = "type", content = "event")]
-enum Event {
-    #[serde(rename = "stt_task_begin")]
-    STTTaskBegin(STTTask),
-    #[serde(rename = "stt_task_progress")]
-    STTTaskProgress(STTTaskProcess),
-    #[serde(rename = "stt_task_end")]
-    STTTaskEnd(STTTaskProcess),
-    None,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-struct STTTaskProcess {
-    id: String,
-    progress: f64,
-}
-#[derive(Debug, Clone, Serialize, Deserialize)]
-struct STTTask {
-    id: String,
-    #[serde(rename = "fileName")]
-    file_name: String,
-    duration: f64,
-    #[serde(rename = "createdAt")]
-    created_at: String,
-}
-
 fn emit_event<R: tauri::Runtime>(event: &Event, manager: &AppHandle<R>) {
     let message = serde_json::to_string(event).unwrap();
     manager.emit("emit_event", message).unwrap();
@@ -114,11 +93,11 @@ fn emit_event<R: tauri::Runtime>(event: &Event, manager: &AppHandle<R>) {
 
 #[tauri::command]
 async fn dispatch_command(
-    command: &str,
+    msg: &str,
     state: tauri::State<'_, AsyncProcState>,
 ) -> Result<(), String> {
     // 将结果重新序列化 传回前端
-    let cmd: Command = serde_json::from_str(command).map_err(|e| e.to_string())?;
+    let cmd: Command = serde_json::from_str(msg).map_err(|e| e.to_string())?;
     let input = state.inner.lock().await;
     input.send(cmd).map_err(|e| e.to_string())
 }
@@ -135,26 +114,23 @@ fn exec_stt_task(path: &PathBuf, app: &AppHandle) -> Result<()> {
     let current_time = chrono::Local::now();
     let current_time = current_time.format("%Y/%m/%d %H:%M").to_string();
     let task_id = get_task_id(path);
-    info!(?task_id);
     let file_name = path
         .file_stem()
         .and_then(|v| v.to_str())
         .map(|v| v.to_string())
         .unwrap_or(task_id.clone());
-    info!(?file_name);
     let input = zimu_dir().join(&format!("{}.wav", &task_id));
     let input = input.display().to_string();
     let _ = script::divide_audio(&path.display().to_string(), &input);
     let duration = script::get_duration(&input)?;
 
+    let stt_task = STTTask {
+        id: task_id.clone(),
+        file_name,
+        duration,
+        created_at: current_time,
+    };
     {
-        info!(?duration);
-        let stt_task = STTTask {
-            id: task_id.clone(),
-            file_name,
-            duration,
-            created_at: current_time,
-        };
         let event = Event::STTTaskBegin(stt_task);
         emit_event(&event, app);
     }
@@ -234,22 +210,4 @@ where
     }
 
     format!("{:x}", context.compute())
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-struct WhisperData {
-    #[serde(rename = "systeminfo")]
-    info: String,
-    transcription: Vec<Transcription>,
-}
-#[derive(Debug, Clone, Serialize, Deserialize)]
-struct Transcription {
-    offsets: Offsets,
-    text: String,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-struct Offsets {
-    from: f64,
-    to: f64,
 }
