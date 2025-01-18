@@ -8,7 +8,6 @@ use chrono::Timelike;
 use extension::zimu_dir;
 use rust_embed::Embed;
 use serde::{Deserialize, Serialize};
-use serde_json::json;
 use tauri::{async_runtime::Mutex, AppHandle, Emitter, Manager};
 use tracing::info;
 mod extension;
@@ -31,7 +30,6 @@ pub fn run() {
 
     let (async_proc_tx, async_proc_rx) = flume::bounded(1);
     tauri::Builder::default()
-        .plugin(tauri_plugin_sql::Builder::new().build())
         .manage(AsyncProcState {
             inner: Mutex::new(async_proc_tx),
         })
@@ -69,6 +67,7 @@ pub fn run() {
             Ok(())
         })
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_dialog::init())
         .invoke_handler(tauri::generate_handler![dispatch_command])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
@@ -99,13 +98,13 @@ struct STTTaskProcess {
     progress: f64,
 }
 #[derive(Debug, Clone, Serialize, Deserialize)]
-struct STTTask{
+struct STTTask {
     id: String,
     #[serde(rename = "fileName")]
-    file_name:String,
-    duration:f64,
+    file_name: String,
+    duration: f64,
     #[serde(rename = "createdAt")]
-    created_at: String
+    created_at: String,
 }
 
 fn emit_event<R: tauri::Runtime>(event: &Event, manager: &AppHandle<R>) {
@@ -149,13 +148,12 @@ fn exec_stt_task(path: &PathBuf, app: &AppHandle) -> Result<()> {
     let duration = script::get_duration(&input)?;
 
     {
-
         info!(?duration);
-        let stt_task = STTTask{
+        let stt_task = STTTask {
             id: task_id.clone(),
             file_name,
             duration,
-            created_at: current_time
+            created_at: current_time,
         };
         let event = Event::STTTaskBegin(stt_task);
         emit_event(&event, app);
@@ -166,36 +164,32 @@ fn exec_stt_task(path: &PathBuf, app: &AppHandle) -> Result<()> {
     let model_path = model_path.display().to_string();
     let language = "en";
     let prompt = "所以我跟大家讲,还是那句话,我不见得有多好,真的,但是我绝对是你们见到的最真的人,我都不愿意说假话.";
-    
+
     // 创建一个线程来处理输出
     let (sx, rx) = flume::bounded(1);
 
+    tauri::async_runtime::spawn_blocking(move || {
+        let mut whisper_process =
+            script::whisper_command(&model_path, &input, language, prompt).unwrap();
+
+        let stdout = whisper_process.stdout.take().unwrap();
+        let reader = std::io::BufReader::new(stdout);
+        for line in reader
+            .lines()
+            .flatten()
+            .map(|v| script::parse_srt_line(&v))
+            .flatten()
+        {
+            sx.send(line).unwrap();
+        }
+    });
     let app = app.clone();
     tauri::async_runtime::spawn(async move {
-
-        tauri::async_runtime::spawn_blocking(move || {
-            let mut whisper_process = script::whisper_command(&model_path, &input, language, prompt).unwrap();
-
-            let stdout = whisper_process
-                .stdout
-                .take()
-                .unwrap();
-            let reader = std::io::BufReader::new(stdout);
-            for line in reader
-                .lines()
-                .flatten()
-                .map(|v| script::parse_srt_line(&v))
-                .flatten()
-            {
-                sx.send(line).unwrap();
-            }
-        });
-        
-        let mut process = STTTaskProcess{
+        let mut process = STTTaskProcess {
             id: task_id.clone(),
-            progress: 0.0
+            progress: 0.0,
         };
-        while let Ok((start, end,text)) = rx.recv() {
+        while let Ok((start, end, text)) = rx.recv() {
             let time = chrono::NaiveTime::parse_from_str(&end, "%H:%M:%S%.3f").unwrap();
             let time = time.num_seconds_from_midnight() as f64;
             process.progress = time;
@@ -207,9 +201,17 @@ fn exec_stt_task(path: &PathBuf, app: &AppHandle) -> Result<()> {
             let event = Event::STTTaskEnd(process.clone());
             emit_event(&event, &app);
         }
+        {
+            // 解析json文件
+            let input = zimu_dir().join(&format!("{}.json", &task_id));
+            if let Ok(data) = std::fs::File::open(&input).and_then(|file| {
+                serde_json::from_reader::<_, WhisperData>(file)
+                    .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))
+            }) {
+                for trans in data.transcription.iter() {}
+            }
+        }
     });
-   
-
 
     Ok(())
 }
@@ -232,4 +234,22 @@ where
     }
 
     format!("{:x}", context.compute())
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct WhisperData {
+    #[serde(rename = "systeminfo")]
+    info: String,
+    transcription: Vec<Transcription>,
+}
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct Transcription {
+    offsets: Offsets,
+    text: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct Offsets {
+    from: f64,
+    to: f64,
 }
