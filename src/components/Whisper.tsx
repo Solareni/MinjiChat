@@ -179,11 +179,6 @@ const Whispser = () => {
 
 	useEffect(() => {
 
-		listen('tauri://drag-drop', (event) => {
-			const files = event.payload;
-			console.log('drag-drop event', files);
-		});
-
 		dispatchCommand({type: "load_whisper_data"});
 
 	}, []);

@@ -1,10 +1,10 @@
 use std::io::BufRead;
 
 use anyhow::{Context, Result};
-
 use crate::extension::whisper_cli;
 
-fn whisper_command(model_path: &str, input_path: &str, language: &str, prompt: &str) -> Result<()> {
+fn whisper_command(
+    model_path: &str, input_path: &str, language: &str, prompt: &str) -> Result<()> {
     let cli = whisper_cli();
 
     let mut child = std::process::Command::new(&cli)

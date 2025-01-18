@@ -1,7 +1,3 @@
-mod extension {
-    include!("src/extension.rs");
-}
-
 fn main() {
     tauri_build::build();
 
@@ -12,7 +8,7 @@ fn main() {
 
     // 执行cmake构建
     let build_dir = whisper.join("build");
-    
+
     // 添加C++17标准
     let mut cmake_config = std::process::Command::new("cmake");
     cmake_config
@@ -24,13 +20,11 @@ fn main() {
 
     // 如果是Windows，启用Vulkan支持
     if cfg!(target_os = "windows") {
-        cmake_config
-            .arg("-DGGML_VULKAN=ON");
+        cmake_config.arg("-DGGML_VULKAN=ON");
     }
     // 如果是macOS，设置最低版本要求
     if cfg!(target_os = "macos") {
-        cmake_config
-            .arg("-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15");
+        cmake_config.arg("-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15");
     }
 
     // 执行配置
@@ -52,14 +46,15 @@ fn main() {
     // 复制whisper-cli到zimu_dir中
     #[cfg(target_os = "windows")]
     let whisper_cli = build_dir.join("bin/Release").join("whisper-cli.exe");
-    
+
     #[cfg(not(target_os = "windows"))]
     let whisper_cli = build_dir.join("bin").join("whisper-cli");
-    
-    let dest = extension::whisper_cli();
-    println!("cargo:warning=Copying whisper-cli to {}", dest.display());
-    std::fs::copy(&whisper_cli, &dest)
-        .expect("Failed to copy whisper-cli");
 
-    // 
+    let assets = dir.join("assets");
+    let _ = std::fs::create_dir(&assets);
+    let dest = assets.join("whisper-cli");
+    println!("cargo:warning=Copying whisper-cli to {}", dest.display());
+    std::fs::copy(&whisper_cli, &dest).expect("Failed to copy whisper-cli");
+
+    //
 }

@@ -12,7 +12,7 @@ pub fn whisper_cli() -> std::path::PathBuf {
     let dir = zimu_dir();
     #[cfg(target_os = "windows")]
     let path = dir.join("whisper-cli.exe");
-    
+
     #[cfg(not(target_os = "windows"))]
     let path = dir.join("whisper-cli");
     path
