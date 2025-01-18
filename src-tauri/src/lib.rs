@@ -4,6 +4,7 @@ use std::{
 };
 
 use anyhow::{Context, Result};
+use chrono::Timelike;
 use extension::zimu_dir;
 use rust_embed::Embed;
 use serde::{Deserialize, Serialize};
@@ -83,17 +84,19 @@ pub enum Command {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type", content = "event")]
 enum Event {
-    #[serde(rename = "begin_stt_task")]
-    BeginSTTTask(STTTask),
+    #[serde(rename = "stt_task_begin")]
+    STTTaskBegin(STTTask),
     #[serde(rename = "stt_task_progress")]
     STTTaskProgress(STTTaskProcess),
+    #[serde(rename = "stt_task_end")]
+    STTTaskEnd(STTTaskProcess),
     None,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 struct STTTaskProcess {
     id: String,
-    progress: String,
+    progress: f64,
 }
 #[derive(Debug, Clone, Serialize, Deserialize)]
 struct STTTask{
@@ -143,16 +146,18 @@ fn exec_stt_task(path: &PathBuf, app: &AppHandle) -> Result<()> {
     let input = zimu_dir().join(&format!("{}.wav", &task_id));
     let input = input.display().to_string();
     let _ = script::divide_audio(&path.display().to_string(), &input);
+    let duration = script::get_duration(&input)?;
+
     {
 
-        let duration = script::get_duration(&input)?;
+        info!(?duration);
         let stt_task = STTTask{
             id: task_id.clone(),
             file_name,
             duration,
             created_at: current_time
         };
-        let event = Event::BeginSTTTask(stt_task);
+        let event = Event::STTTaskBegin(stt_task);
         emit_event(&event, app);
     }
     // whisper
@@ -188,11 +193,18 @@ fn exec_stt_task(path: &PathBuf, app: &AppHandle) -> Result<()> {
         
         let mut process = STTTaskProcess{
             id: task_id.clone(),
-            progress: "".to_string()
+            progress: 0.0
         };
         while let Ok((start, end,text)) = rx.recv() {
-            process.progress = end;
+            let time = chrono::NaiveTime::parse_from_str(&end, "%H:%M:%S%.3f").unwrap();
+            let time = time.num_seconds_from_midnight() as f64;
+            process.progress = time;
             let event = Event::STTTaskProgress(process.clone());
+            emit_event(&event, &app);
+        }
+        {
+            process.progress = duration;
+            let event = Event::STTTaskEnd(process.clone());
             emit_event(&event, &app);
         }
     });

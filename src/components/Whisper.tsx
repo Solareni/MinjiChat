@@ -3,16 +3,20 @@ import { ActionIcon, ContentIcon, InputDeleteIcon } from "./SvgIcons";
 import { Link, useParams } from "react-router-dom";
 import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { generateSearchResults } from "../mock";
-import { dispatchCommand, WhisperItem } from "../types";
+import { dispatchCommand, ProgressData, WhisperItem } from "../types";
 import { listen } from "@tauri-apps/api/event";
 
 interface ListItemProps {
 	index: number;
 	style: React.CSSProperties;
-	data: WhisperItem;
+	data: ListItemData;
 }
 
-const ListItem = ({ index, style , data}: ListItemProps) => {
+interface ListItemData {
+	items: WhisperItem[];
+}
+const ListItem = ({ index, style, data }: ListItemProps) => {
+	const result = data.items[index];
 	return (
 		<Link to={`/whisper/${index + 1}`} style={style} className="block">
 			<div className="grid grid-cols-[2fr_1fr_100px] items-center hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
@@ -20,13 +24,20 @@ const ListItem = ({ index, style , data}: ListItemProps) => {
 				<div className="flex items-center gap-4">
 					<ContentIcon />
 					<div>
-						<div className="font-medium">{data.fileName}</div>
-						<div className="text-sm text-gray-500">{data.duration}</div>
+						<div className="font-medium">{result.fileName}</div>
+
+						{result.progress && result.progress < result.duration ? (
+							<div className="text-sm text-yellow-500">
+								处理了 {(result.progress / result.duration * 100).toFixed(2)}%
+							</div> // 或者 null
+						) : (
+							<div className="text-sm text-gray-500">时长{result.duration}s</div> // 或者 null
+						)}
 					</div>
 				</div>
 
 				{/* 创建时间 */}
-				<div className="text-sm text-gray-500">{data.createdAt}</div>
+				<div className="text-sm text-gray-500">{result.createdAt}</div>
 
 				{/* 操作 */}
 				<div className="flex justify-end">
@@ -133,9 +144,20 @@ const Whispser = () => {
 	const [resultsCount, setResultsCount] = useState(0);
 	const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
 	const [whisperData, setWhisperData] = useState<WhisperItem[]>([]);
+	const [progress, setProgress] = useState<ProgressData>();
 	const listRef = useRef<any>(null);
 	const sizeMap = useRef<{ [key: number]: number }>({});
 
+	useEffect(() => {
+		if (progress) {
+			const updatedWhisperData = whisperData.map((item) =>
+				item.id === progress.id
+					? { ...item, progress: progress.progress }
+					: item
+			);
+			setWhisperData(updatedWhisperData);
+		}
+	}, [progress, whisperData]);
 	const getSize = useCallback((index: number) => {
 		return sizeMap.current[index] || 250;
 	}, []);
@@ -182,27 +204,32 @@ const Whispser = () => {
 		const unsubscribe = listen<string>("emit_event", (event) => {
 			const payload = JSON.parse(event.payload);
 			switch (payload.type) {
-				case "begin_stt_task":{
+				case "stt_task_begin": {
 					const data = payload.event;
-					setWhisperData((prevData) => [data, ...prevData]);
-					break;
-			}
-				case "stt_task_progress":{
-					const data = payload.event;
-					console.log(`任务进度 ${data.process}%`)
+					setWhisperData([data, ...whisperData]);
 					break;
 				}
-				default:{
+				case "stt_task_progress": {
+					const data = payload.event;
+					setProgress(data);
+					break;
+				}
+				case "stt_task_end": {
+					const data = payload.event;
+					setProgress(data);
+					break;
+				}
+				default: {
 					console.log(`未知事件 ${event}`);
 				}
 			}
 		});
 
-		dispatchCommand({type: "load_whisper_data"});
+		dispatchCommand({ type: "load_whisper_data" });
 
 		return () => {
 			unsubscribe.then((unlisten) => unlisten());
-		}
+		};
 	}, []);
 
 	return (
@@ -256,8 +283,11 @@ const Whispser = () => {
 							itemCount={whisperData.length}
 							itemSize={80}
 							width="100%"
+							itemData={{
+								items: whisperData,
+							}}
 						>
-							{({ index, style }) => <ListItem index={index} style={style} data={whisperData[index]} />}
+							{ListItem}
 						</FixedSizeList>
 					</div>
 				</div>

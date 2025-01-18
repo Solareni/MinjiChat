@@ -39,11 +39,18 @@ class DatabaseManager {
 }
 
 export interface WhisperItem {
-	id: number;
+	id: string;
 	fileName: string;
-	duration: string;
+	duration: number;
 	createdAt: string;
+  progress?: number;
 }
+
+export interface ProgressData{
+  id: string;
+  progress: number;
+}
+
 
 export interface AstaCommand {
 	type: string;
