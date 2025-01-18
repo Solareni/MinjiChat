@@ -4,7 +4,6 @@ import { Link, useParams } from "react-router-dom";
 import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { generateSearchResults } from "../mock";
 import { dispatchCommand, WhisperItem } from "../types";
-import { listen } from "@tauri-apps/api/event";
 
 interface ListItemProps {
 	index: number;
@@ -178,7 +177,6 @@ const Whispser = () => {
 	// 首次加载，读取whisperData
 
 	useEffect(() => {
-
 		dispatchCommand({type: "load_whisper_data"});
 
 	}, []);
