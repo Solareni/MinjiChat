@@ -1,9 +1,9 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { CaptionBackIcon } from "./SvgIcons";
-import { VariableSizeList as List } from "react-window";
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import { dispatchCommand, WhisperItem } from "../types";
 import { listen } from "@tauri-apps/api/event";
+import { VirtualList } from "./VirtualList";
 
 function formatTime(ms: number): string {
 	const totalSeconds = Math.floor(ms / 1000);
@@ -161,67 +161,26 @@ export const WhisperDetail = () => {
 		};
 	}, []);
 
-	const listRef = useRef<any>(null);
-
-	const listContainerRef = useRef<HTMLDivElement>(null);
-
-	const [windowHeight, setWindowHeight] = useState(window.innerHeight);
 	const [searchKeyword, setSearchKeyword] = useState<string>();
-	const [searchItems, setSearchItems] = useState<any[]>([]);
-	const [searchIndex, setSearchIndex] = useState(0);
-	const sizeMap = useRef<{ [key: number]: number }>({});
 
-	const getSize = useCallback((index: number) => {
-		return sizeMap.current[index] || 70;
-	}, []);
-
-	const setSize = useCallback((index: number, size: number) => {
-		sizeMap.current[index] = size;
-		listRef.current?.resetAfterIndex(index);
-	}, []);
-
-	useEffect(() => {
-		const handleResize = () => {
-			if (listContainerRef.current) {
-				setWindowHeight(listContainerRef.current.clientHeight);
-				setTimeout(() => {
-					if (listRef.current) {
-						listRef.current.resetAfterIndex(0, true);
-					}
-				}, 0);
-			}
-		};
-		window.addEventListener("resize", handleResize);
-		handleResize();
-		return () => {
-			window.removeEventListener("resize", handleResize);
-		};
-	}, []);
-
-	useEffect(() => {
-		if (listRef.current && message.length > 0) {
-			listRef.current.resetAfterIndex(0, true);
-		}
-	}, [message]);
-
-	const scrollTimeoutRef = useRef<any>();
-	useEffect(() => {
-		if (searchItems.length > 0 && listRef.current) {
-			if (scrollTimeoutRef.current) {
-				clearTimeout(scrollTimeoutRef.current);
-			}
-			scrollTimeoutRef.current = setTimeout(() => {
-				const targetIndex = searchItems[searchIndex].index;
-				listRef.current.resetAfterIndex(0, true);
-				listRef.current.scrollToItem(targetIndex, "center");
-			}, 300);
-		}
-		return () => {
-			if (scrollTimeoutRef.current) {
-				clearTimeout(scrollTimeoutRef.current);
-			}
-		};
-	}, [searchItems, searchIndex]);
+	// const scrollTimeoutRef = useRef<any>();
+	// useEffect(() => {
+	// 	if (searchItems.length > 0 && listRef.current) {
+	// 		if (scrollTimeoutRef.current) {
+	// 			clearTimeout(scrollTimeoutRef.current);
+	// 		}
+	// 		scrollTimeoutRef.current = setTimeout(() => {
+	// 			const targetIndex = searchItems[searchIndex].index;
+	// 			listRef.current.resetAfterIndex(0, true);
+	// 			listRef.current.scrollToItem(targetIndex, "center");
+	// 		}, 300);
+	// 	}
+	// 	return () => {
+	// 		if (scrollTimeoutRef.current) {
+	// 			clearTimeout(scrollTimeoutRef.current);
+	// 		}
+	// 	};
+	// }, [searchItems, searchIndex]);
 
 	const navigate = useNavigate();
 	return (
@@ -248,29 +207,13 @@ export const WhisperDetail = () => {
 					/>
 				</div>
 			</div>
-
-			{/* 对话列表 */}
-			<div
-				ref={listContainerRef}
+			<VirtualList
 				className="flex-1 relative bg-slate-50 text-sm leading-6 text-slate-900 shadow-md dark:bg-slate-900 dark:text-slate-50 sm:text-base sm:leading-7 w-full h-full"
 				style={{ overflow: "hidden" }}
-			>
-				<List
-					ref={listRef}
-					height={windowHeight}
-					itemCount={message.length}
-					itemSize={getSize}
-					width="100%"
-					itemData={{
-						items: message,
-						setSize,
-						searchKeyword: searchKeyword ?? undefined,
-					}}
-					overscanCount={5}
-				>
-					{Row}
-				</List>
-			</div>
+				message={message}
+				searchKeyword={searchKeyword}
+				rowRenderer={Row}
+			/>
 		</div>
 	);
 };

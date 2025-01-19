@@ -1,6 +1,8 @@
-use crate::types::{STTTaskContent, Transcription};
+use std::collections::HashMap;
+
+use crate::types::{STTSearchTasksLike, STTTaskContent, Transcription};
 use crate::{extension::zimu_dir, types::STTTask};
-use anyhow::{Context, Result};
+use anyhow::{anyhow, Context, Result};
 use sqlx::sqlite::SqliteQueryResult;
 use sqlx::Row;
 use tracing::info;
@@ -11,6 +13,43 @@ pub struct Db {
 }
 
 impl Db {
+    pub async fn search_tasks_like(&self, query: &str) -> Result<Vec<STTSearchTasksLike>> {
+        let search_value = format!("%{}%", query); // 添加通配符以支持模糊查询
+
+        let results = sqlx::query(
+            r#"
+            SELECT stt_tasks.id, stt_tasks.file_name, stt_tasks.duration, stt_tasks.created_at, stt_sentences.text
+            FROM stt_tasks
+            JOIN stt_sentences ON stt_tasks.id = stt_sentences.task_id
+            WHERE stt_sentences.text LIKE ?
+            "#,
+        )
+        .bind(&search_value)
+        .fetch_all(&self.pool)
+        .await?
+        .into_iter()
+        .fold(HashMap::new(),|mut acc, v|{
+            let task = STTTask {
+                id: v.get("id"),
+                file_name: v.get("file_name"),
+                duration: v.get("duration"),
+                created_at: v.get("created_at"),
+            };
+            let text: String = v.get("text");
+            acc.entry(task).or_insert_with(Vec::new).push(text);
+            acc
+        })
+        .into_iter()
+        .map(|(task, texts)| {
+
+            STTSearchTasksLike {
+                task,
+                transcript_snippets: texts,
+            }
+        }).collect::<Vec<_>>();
+
+        Ok(results)
+    }
     pub async fn fetch_task(&self, task_id: &str) -> Result<STTTask> {
         let task = sqlx::query("SELECT * FROM stt_tasks WHERE id = $1")
             .bind(task_id)

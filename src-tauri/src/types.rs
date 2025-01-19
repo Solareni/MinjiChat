@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use std::hash::{Hash, Hasher};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WhisperData {
@@ -18,8 +19,6 @@ pub struct Offsets {
     pub to: f64,
 }
 
-
-
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type", content = "command")]
 pub enum Command {
@@ -30,7 +29,9 @@ pub enum Command {
     #[serde(rename = "stt_fetch_task_list")]
     STTFetchTaskList,
     #[serde(rename = "stt_fetch_task_simple")]
-    STTFetchTaskSimple(String)
+    STTFetchTaskSimple(String),
+    #[serde(rename = "stt_search_tasks_like")]
+    STTSearchTasksLike(String),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -46,15 +47,19 @@ pub enum Event {
     STTTaskList(Vec<STTTask>),
     #[serde(rename = "stt_task_content")]
     STTaskContent(Vec<STTTaskContent>),
+    #[serde(rename = "stt_task_search_result")]
+    STTaskSearchResult(Vec<STTSearchTasksLike>),
+    #[serde(rename = "stt_task_search_result_simple")]
+    STTaskSearchResultSimple(STTSearchTasksLike),
     #[serde(rename = "stt_task_simple")]
     STTaskSimple(STTTask),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct STTTaskContent{
+pub struct STTTaskContent {
     pub content: String,
     pub start: f64,
-    pub end: f64
+    pub end: f64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -62,6 +67,7 @@ pub struct STTTaskProcess {
     pub id: String,
     pub progress: f64,
 }
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct STTTask {
     pub id: String,
@@ -70,4 +76,29 @@ pub struct STTTask {
     pub duration: f64,
     #[serde(rename = "createdAt")]
     pub created_at: String,
+}
+
+// 实现 PartialEq，只比较 id 字段
+impl PartialEq for STTTask {
+    fn eq(&self, other: &Self) -> bool {
+        self.id == other.id
+    }
+}
+
+// 实现 Eq
+impl Eq for STTTask {}
+
+// 实现 Hash，只对 id 字段进行哈希
+impl Hash for STTTask {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.id.hash(state);
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct STTSearchTasksLike {
+    #[serde(flatten)]
+    pub task: STTTask,
+    #[serde(rename = "transcriptSnippets")]
+    pub transcript_snippets: Vec<String>,
 }

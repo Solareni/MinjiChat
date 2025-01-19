@@ -1,10 +1,9 @@
-import { FixedSizeList, VariableSizeList as List } from "react-window";
 import { ActionIcon, ContentIcon, InputDeleteIcon } from "./SvgIcons";
 import { Link, useParams } from "react-router-dom";
 import { useState, useRef, useCallback, useEffect, useMemo } from "react";
-import { generateSearchResults } from "../mock";
 import { dispatchCommand, ProgressData, WhisperItem } from "../types";
 import { listen } from "@tauri-apps/api/event";
+import { VirtualList } from "./VirtualList";
 
 interface ListItemProps {
 	index: number;
@@ -31,7 +30,9 @@ const ListItem = ({ index, style, data }: ListItemProps) => {
 					<div className="text-sm text-gray-500">{result.duration}s</div> // 或者 null
 				)}
 				{/* 创建时间 */}
-				<div className="text-sm text-gray-500 whitespace-nowrap">{result.createdAt}</div>
+				<div className="text-sm text-gray-500 whitespace-nowrap">
+					{result.createdAt}
+				</div>
 			</div>
 		</Link>
 	);
@@ -40,6 +41,7 @@ const ListItem = ({ index, style, data }: ListItemProps) => {
 interface ItemData {
 	items: SearchResult[];
 	setSize: (index: number, size: number) => void;
+	searchKeyword?: string;
 }
 
 const SearchResultItem = ({
@@ -122,7 +124,7 @@ const SearchResultItem = ({
 interface SearchResult {
 	id: number;
 	fileName: string;
-	duration: string;
+	duration: number;
 	createdAt: string;
 	transcriptSnippets: string[];
 }
@@ -130,12 +132,9 @@ interface SearchResult {
 const Whisper = () => {
 	const [searchValue, setSearchValue] = useState("");
 	const [showClearButton, setShowClearButton] = useState(false);
-	const [resultsCount, setResultsCount] = useState(0);
 	const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
 	const [whisperData, setWhisperData] = useState<WhisperItem[]>([]);
 	const [progress, setProgress] = useState<ProgressData>();
-	const listRef = useRef<any>(null);
-	const sizeMap = useRef<{ [key: number]: number }>({});
 
 	useEffect(() => {
 		if (progress) {
@@ -147,39 +146,18 @@ const Whisper = () => {
 			setWhisperData(updatedWhisperData);
 		}
 	}, [progress, whisperData]);
-	const getSize = useCallback((index: number) => {
-		return sizeMap.current[index] || 250;
-	}, []);
-
-	const setSize = useCallback((index: number, size: number) => {
-		if (sizeMap.current[index] !== size) {
-			sizeMap.current[index] = size;
-			listRef.current?.resetAfterIndex(index);
-		}
-	}, []);
 
 	const handleSearch = () => {
-		// 清空之前的结果
-		sizeMap.current = [];
-		if (listRef.current) {
-			listRef.current.resetAfterIndex(0);
-		}
-
-		const newResults = generateSearchResults();
-		setSearchResults(newResults);
-
-		// 模拟搜索逻辑
-		const count = searchValue ? newResults.length : 0;
-		setResultsCount(count);
-		console.log("执行搜索:", searchValue);
+		dispatchCommand({ type: "stt_search_tasks_like", command: searchValue });
 	};
 
 	const handleClear = () => {
 		setSearchValue("");
 		setShowClearButton(false);
-		setResultsCount(0);
+		setResultsCount(false);
 		console.log("清除搜索");
 	};
+	const [resultsCount, setResultsCount] = useState(false);
 
 	const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
 		if (event.key === "Enter") {
@@ -208,9 +186,15 @@ const Whisper = () => {
 					setProgress(data);
 					break;
 				}
-				case "stt_task_list":{
+				case "stt_task_list": {
 					const data = payload.event;
 					setWhisperData(data);
+					break;
+				}
+				case "stt_task_search_result": {
+					const data = payload.event;
+					setSearchResults(data);
+					setResultsCount(true);
 					break;
 				}
 				default: {
@@ -271,46 +255,30 @@ const Whisper = () => {
 					<hr className="mb-4" />
 
 					{/* 虚拟列表区域 */}
-					<div className="h-[600px]">
-						<FixedSizeList
-							height={600}
-							itemCount={whisperData.length}
-							itemSize={80}
-							width="100%"
-							itemData={{
-								items: whisperData,
-							}}
-						>
-							{ListItem}
-						</FixedSizeList>
-					</div>
+					<VirtualList
+						className="w-full h-full"
+						message={whisperData}
+						rowRenderer={ListItem}
+					/>
 				</div>
 			) : (
 				<div>
 					<div className="flex items-center justify-between mb-8">
-						<span className="font-medium">
-							共{resultsCount}个与"{searchValue}"相关的结果
-						</span>
+						{resultsCount && (
+							<span className="font-medium">
+								共{searchResults.length}个与"{searchValue}"相关的结果
+							</span>
+						)}
 					</div>
 					{/* 分割线 */}
 					<hr className="mb-4" />
 
 					{/* 搜索结果列表 */}
-					<div className="h-[600px]">
-						<List
-							ref={listRef}
-							height={700}
-							itemCount={resultsCount}
-							itemSize={getSize}
-							width="100%"
-							itemData={{
-								items: searchResults,
-								setSize,
-							}}
-						>
-							{SearchResultItem}
-						</List>
-					</div>
+					<VirtualList
+						message={searchResults}
+						className="w-full h-full"
+						rowRenderer={SearchResultItem}
+					/>
 				</div>
 			)}
 		</div>

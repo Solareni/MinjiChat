@@ -87,6 +87,12 @@ pub fn run() {
                                     emit_event(&event, &handle);
                                 }
                             }
+                            Command::STTSearchTasksLike(query) => {
+                                if let Ok(tasks) = pool.search_tasks_like(&query).await{
+                                    let event = Event::STTaskSearchResult(tasks);
+                                    emit_event(&event, &handle);
+                                }
+                            }
                         }
                     }
                 }
