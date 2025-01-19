@@ -1,5 +1,5 @@
 // Sidebar.tsx
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import {
 	WhisperIcon,
 	ConversationsIcon,
@@ -11,6 +11,7 @@ import {
 	UserIcon,
 } from "./SvgIcons";
 import { router } from "../router";
+import { useEffect } from "react";
 
 const getIcon = (path: string) => {
 	switch (path) {
@@ -53,6 +54,17 @@ const Sidebar = () => {
 		(route) => route.path !== "theme" && route.path !== "settings"
 	);
 
+	const navigate = useNavigate();
+	useEffect(() => {
+		if (sidebars[0].path) {
+			if (
+				sidebars.length > 0 &&
+				!window.location.pathname.includes(sidebars[0].path)
+			) {
+				navigate(sidebars[0].path);
+			}
+		}
+	}, []);
 	const renderRoutes = (routes: any[]) => {
 		return routes.map((route) => {
 			const path = route.path!;

@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { CaptionBackIcon } from "./SvgIcons";
-import React, { useState, useRef, useCallback, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { dispatchCommand, WhisperItem } from "../types";
 import { listen } from "@tauri-apps/api/event";
 import { highlightText, VirtualList } from "./VirtualList";
