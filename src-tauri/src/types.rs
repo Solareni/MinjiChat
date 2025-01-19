@@ -34,6 +34,8 @@ pub enum Command {
     STTSearchTasksLike(String),
 }
 
+
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type", content = "event")]
 pub enum Event {
@@ -49,8 +51,6 @@ pub enum Event {
     STTaskContent(Vec<STTTaskContent>),
     #[serde(rename = "stt_task_search_result")]
     STTaskSearchResult(Vec<STTSearchTasksLike>),
-    #[serde(rename = "stt_task_search_result_simple")]
-    STTaskSearchResultSimple(STTSearchTasksLike),
     #[serde(rename = "stt_task_simple")]
     STTaskSimple(STTTask),
 }

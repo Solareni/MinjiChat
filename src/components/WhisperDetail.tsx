@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { CaptionBackIcon } from "./SvgIcons";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { dispatchCommand, WhisperItem } from "../types";
 import { listen } from "@tauri-apps/api/event";
 import { highlightText, VirtualList } from "./VirtualList";
@@ -22,6 +22,7 @@ interface WhisperDetailProps {
 	content: string;
 	start: number;
 	end: number;
+	index?: number;
 }
 const MessageTime = React.memo(
 	({ start, end }: { start: number; end: number }) => {
@@ -93,6 +94,9 @@ export const WhisperDetail = () => {
 	const { id } = useParams();
 	const [message, setMessage] = useState<WhisperDetailProps[]>([]);
 	const [task, setTask] = useState<WhisperItem>();
+	const [searchIndex, setSearchIndex] = useState(0);
+	const [searchItems, setSearchItems] = useState<any[]>([]);
+
 	useEffect(() => {
 		dispatchCommand({ type: "stt_fetch_task_trans", command: id });
 		dispatchCommand({ type: "stt_fetch_task_simple", command: id });
@@ -113,7 +117,6 @@ export const WhisperDetail = () => {
 					setTask(data);
 					break;
 				}
-
 				default: {
 					console.log(`未知事件 ${event}`);
 				}
@@ -126,24 +129,31 @@ export const WhisperDetail = () => {
 
 	const [searchKeyword, setSearchKeyword] = useState<string>();
 
-	// const scrollTimeoutRef = useRef<any>();
-	// useEffect(() => {
-	// 	if (searchItems.length > 0 && listRef.current) {
-	// 		if (scrollTimeoutRef.current) {
-	// 			clearTimeout(scrollTimeoutRef.current);
-	// 		}
-	// 		scrollTimeoutRef.current = setTimeout(() => {
-	// 			const targetIndex = searchItems[searchIndex].index;
-	// 			listRef.current.resetAfterIndex(0, true);
-	// 			listRef.current.scrollToItem(targetIndex, "center");
-	// 		}, 300);
-	// 	}
-	// 	return () => {
-	// 		if (scrollTimeoutRef.current) {
-	// 			clearTimeout(scrollTimeoutRef.current);
-	// 		}
-	// 	};
-	// }, [searchItems, searchIndex]);
+	const handleSearch = (text: string) => {
+		if (searchKeyword !== text) {
+			setSearchIndex(0);
+			setSearchItems([]);
+		}
+		setSearchKeyword(text);
+		if (searchItems.length > 0) {
+			setSearchIndex((prev) => (prev + 1) % searchItems.length);
+		} else{
+			const items = message.filter((item, index) => {
+				item.index = index;
+				return item.content.includes(text);
+			});
+			console.log(`${JSON.stringify(items)}`)
+			setSearchItems(items);
+			setSearchIndex(0);
+		}
+	};
+
+	const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+		if (event.key === "Enter") {
+			handleSearch(inputRef.current?.value || '');
+		}
+	};
+	const inputRef = useRef<HTMLInputElement>(null);
 
 	const navigate = useNavigate();
 	return (
@@ -164,9 +174,14 @@ export const WhisperDetail = () => {
 				<span className="text-lg">对话记录</span>
 				<div className="flex items-center gap-2">
 					<input
+						ref={inputRef}
 						type="text"
 						placeholder="搜索..."
 						className="px-2 py-1 border rounded dark:bg-gray-800 dark:border-gray-700"
+						autoCorrect="off"
+						autoCapitalize="off"
+						spellCheck="false"
+						onKeyDown={handleKeyDown}
 					/>
 				</div>
 			</div>

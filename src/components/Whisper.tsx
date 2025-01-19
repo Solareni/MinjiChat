@@ -45,7 +45,6 @@ interface ItemData {
 	searchKeyword?: string;
 }
 
-
 const SearchResultItem = ({
 	index,
 	style,
@@ -56,7 +55,7 @@ const SearchResultItem = ({
 	data: ItemData;
 }) => {
 	const result = data.items[index];
-	const rowRef = useDynamicHeight(index,data, result.transcriptSnippets);
+	const rowRef = useDynamicHeight(index, data, result.transcriptSnippets);
 	return (
 		<div style={{ ...style, height: "auto" }}>
 			<div ref={rowRef} className="space-y-4">
@@ -205,6 +204,9 @@ const Whisper = () => {
 						setShowClearButton(e.target.value.length > 0);
 					}}
 					onKeyDown={handleKeyDown}
+					autoCorrect="off"
+					autoCapitalize="off"
+					spellCheck="false"
 				/>
 				{showClearButton && (
 					<div className="absolute right-4 top-1/2 transform -translate-y-1/2">
