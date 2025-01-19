@@ -44,7 +44,7 @@ export const router = createBrowserRouter([
     path: "/",
     element: <Layout />,
     children: [
-      { path: "logo", element: <div /> },
+      // { path: "logo", element: <div /> },
       { path: "whisper", children:[ 
         { index: true, element: <Whisper /> },
         { path: ":id", element: <WhisperDetail /> } // 新增详情页
