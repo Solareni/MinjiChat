@@ -52,7 +52,12 @@ fn main() {
 
     let assets = dir.join("assets");
     let _ = std::fs::create_dir(&assets);
+    
+    #[cfg(not(target_os = "windows"))]
     let dest = assets.join("whisper-cli");
+
+    #[cfg(target_os = "windows")]
+    let dest = assets.join("whisper-cli.exe");
     println!("cargo:warning=Copying whisper-cli to {}", dest.display());
     std::fs::copy(&whisper_cli, &dest).expect("Failed to copy whisper-cli");
 

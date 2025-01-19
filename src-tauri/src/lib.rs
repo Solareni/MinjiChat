@@ -21,12 +21,16 @@ pub fn run() {
     tracing_subscriber::fmt::init();
     ffmpeg_sidecar::download::auto_download().unwrap();
     {
+        #[cfg(target_os = "windows")]
+        let whisper_cli = Assets::get("whisper-cli.exe").unwrap();
+
+        #[cfg(not(target_os = "windows"))]
         let whisper_cli = Assets::get("whisper-cli").unwrap();
         let whisper_cli_path = extension::whisper_cli();
         std::fs::write(&whisper_cli_path, whisper_cli.data).unwrap();
     }
     {
-        let embed = Assets::get("ggml-model-whisper-tiny-q5_1.bin").unwrap();
+        let embed = Assets::get("ggml-tiny-q5_1.bin").unwrap();
         let model_path = zimu_dir().join("ggml-model-whisper-tiny-q5_1.bin");
         let mut file = std::fs::File::create(&model_path).unwrap();
         file.write_all(&embed.data).unwrap();

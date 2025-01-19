@@ -1,29 +1,11 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { CaptionBackIcon } from "./SvgIcons";
 import React, { useState, useEffect, useRef } from "react";
-import { dispatchCommand, WhisperItem } from "../types";
+import { dispatchCommand, formatTime, ItemData, MessageProps, WhisperDetailProps, WhisperItem } from "../types";
 import { listen } from "@tauri-apps/api/event";
 import { highlightText, VirtualList } from "./VirtualList";
 import { useDynamicHeight } from "../hooks/useDynamicHeight";
 
-function formatTime(ms: number): string {
-	const totalSeconds = Math.floor(ms / 1000);
-	const hours = Math.floor(totalSeconds / 3600);
-	const minutes = Math.floor((totalSeconds % 3600) / 60);
-	const seconds = totalSeconds % 60;
-
-	// 使用 padStart 补零
-	const pad = (num: number) => num.toString().padStart(2, "0");
-
-	return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
-}
-
-interface WhisperDetailProps {
-	content: string;
-	start: number;
-	end: number;
-	index?: number;
-}
 const MessageTime = React.memo(
 	({ start, end }: { start: number; end: number }) => {
 		return (
@@ -43,10 +25,8 @@ const MessageTime = React.memo(
 		);
 	}
 );
-interface MessageProps {
-	message: WhisperDetailProps;
-	searchKeyworkd?: string;
-}
+
+
 const Message = React.memo(({ message, searchKeyworkd }: MessageProps) => {
 	return (
 		<div className="flex bg-slate-100 px-4 py-4 pt-6 dark:bg-slate-900 sm:px-6 border-b border-slate-200 dark:border-slate-700">
@@ -64,12 +44,7 @@ const Message = React.memo(({ message, searchKeyworkd }: MessageProps) => {
 	);
 });
 
-interface ItemData {
-	items: WhisperDetailProps[];
-	setSize: (index: number, size: number) => void;
-	searchKeyword?: string;
-}
-const Row = ({
+const DetailRow = ({
 	index,
 	style,
 	data,
@@ -197,7 +172,7 @@ export const WhisperDetail = () => {
 				style={{ overflow: "hidden" }}
 				message={message}
 				searchKeyword={searchKeyword}
-				rowRenderer={Row}
+				rowRenderer={DetailRow}
 			/>
 		</div>
 	);
