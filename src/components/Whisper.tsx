@@ -3,7 +3,8 @@ import { Link, useParams } from "react-router-dom";
 import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { dispatchCommand, ProgressData, WhisperItem } from "../types";
 import { listen } from "@tauri-apps/api/event";
-import { VirtualList } from "./VirtualList";
+import { highlightText, VirtualList } from "./VirtualList";
+import { useDynamicHeight } from "../hooks/useDynamicHeight";
 
 interface ListItemProps {
 	index: number;
@@ -44,27 +45,6 @@ interface ItemData {
 	searchKeyword?: string;
 }
 
-const highlightText = (text: string, keyword?: string) => {
-	if (!keyword) {
-	  return <>{text}</>;
-	}
-	const regex = new RegExp(keyword, "gi");
-	const parts = text.split(regex);
-	return (
-	  <>
-		{parts.map((part, i) => (
-		  <span key={i}>
-			{part}
-			{i < parts.length - 1 && (
-			  <span className="bg-yellow-200 text-yellow-900">
-				{text.match(regex)?.[i]}
-			  </span>
-			)}
-		  </span>
-		))}
-	  </>
-	);
-  };
 
 const SearchResultItem = ({
 	index,
@@ -76,28 +56,7 @@ const SearchResultItem = ({
 	data: ItemData;
 }) => {
 	const result = data.items[index];
-	const rowRef = useRef<HTMLDivElement>(null);
-
-	const updateSize = useCallback(() => {
-		if (rowRef.current) {
-			const newHeight = rowRef.current.getBoundingClientRect().height;
-			data.setSize(index, newHeight);
-		}
-	}, [index, data]);
-
-	useEffect(() => {
-		updateSize();
-	}, [result.transcriptSnippets]); // 当内容变化时重新计算高度
-
-	useEffect(() => {
-		const handleResize = () => {
-			updateSize();
-		};
-		window.addEventListener("resize", handleResize);
-		return () => {
-			window.removeEventListener("resize", handleResize);
-		};
-	}, [updateSize]);
+	const rowRef = useDynamicHeight(index,data, result.transcriptSnippets);
 	return (
 		<div style={{ ...style, height: "auto" }}>
 			<div ref={rowRef} className="space-y-4">

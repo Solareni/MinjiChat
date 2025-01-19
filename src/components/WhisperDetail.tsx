@@ -3,7 +3,8 @@ import { CaptionBackIcon } from "./SvgIcons";
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import { dispatchCommand, WhisperItem } from "../types";
 import { listen } from "@tauri-apps/api/event";
-import { VirtualList } from "./VirtualList";
+import { highlightText, VirtualList } from "./VirtualList";
+import { useDynamicHeight } from "../hooks/useDynamicHeight";
 
 function formatTime(ms: number): string {
 	const totalSeconds = Math.floor(ms / 1000);
@@ -46,16 +47,6 @@ interface MessageProps {
 	searchKeyworkd?: string;
 }
 const Message = React.memo(({ message, searchKeyworkd }: MessageProps) => {
-	const highlightText = (text: string, keyword?: string) => {
-		if (!keyword) {
-			return text;
-		}
-		const regex = new RegExp(keyword, "gi");
-		return text.replace(
-			regex,
-			(match) => `<span class="bg-yellow-200 text-yellow-900">${match}</span>`
-		);
-	};
 	return (
 		<div className="flex bg-slate-100 px-4 py-4 pt-6 dark:bg-slate-900 sm:px-6 border-b border-slate-200 dark:border-slate-700">
 			<div className="relative mt-2">
@@ -87,35 +78,7 @@ const Row = ({
 	data: ItemData;
 }) => {
 	const item = data.items[index];
-	const rowRef = useRef<HTMLDivElement>(null);
-
-	useEffect(() => {
-		if (rowRef.current) {
-			const newHeight = rowRef.current.getBoundingClientRect().height;
-			data.setSize(index, newHeight);
-		}
-	}, [item.content]); // 当内容变化时重新计算高度
-
-	const updateSize = useCallback(() => {
-		if (rowRef.current) {
-			const newHeight = rowRef.current.getBoundingClientRect().height;
-			data.setSize(index, newHeight);
-		}
-	}, [index, data]);
-
-	useEffect(() => {
-		updateSize();
-	}, [item.content]); // 当内容变化时重新计算高度
-
-	useEffect(() => {
-		const handleResize = () => {
-			updateSize();
-		};
-		window.addEventListener("resize", handleResize);
-		return () => {
-			window.removeEventListener("resize", handleResize);
-		};
-	}, [updateSize]);
+	const rowRef = useDynamicHeight(index, data, item.content);
 
 	return (
 		<div style={style}>

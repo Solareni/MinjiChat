@@ -16,8 +16,8 @@ export const VirtualList = ({
 	rowRenderer,
 }: VirtualListProps) => {
 	const listContainerRef = useRef<HTMLDivElement>(null);
-	const listRef = useRef<any>(null);
 	const [windowHeight, setWindowHeight] = useState(window.innerHeight);
+    const listRef = useRef<any>(null);
 	const sizeMap = useRef<{ [key: number]: number }>({});
 	const getSize = useCallback((index: number) => {
 		return sizeMap.current[index] || 70;
@@ -71,3 +71,26 @@ export const VirtualList = ({
 		</div>
 	);
 };
+
+
+export const highlightText = (text: string, keyword?: string) => {
+	if (!keyword) {
+	  return <>{text}</>;
+	}
+	const regex = new RegExp(keyword, "gi");
+	const parts = text.split(regex);
+	return (
+	  <>
+		{parts.map((part, i) => (
+		  <span key={i}>
+			{part}
+			{i < parts.length - 1 && (
+			  <span className="bg-yellow-200 text-yellow-900">
+				{text.match(regex)?.[i]}
+			  </span>
+			)}
+		  </span>
+		))}
+	  </>
+	);
+  };
