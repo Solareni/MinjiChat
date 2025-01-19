@@ -8,14 +8,14 @@ pub struct WhisperData {
 }
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Transcription {
-    offsets: Offsets,
-    text: String,
+    pub offsets: Offsets,
+    pub text: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-struct Offsets {
-    from: f64,
-    to: f64,
+pub struct Offsets {
+    pub from: f64,
+    pub to: f64,
 }
 
 
@@ -25,6 +25,8 @@ struct Offsets {
 pub enum Command {
     #[serde(rename = "stt_task_process")]
     STTTaskProcess(String),
+    #[serde(rename = "stt_task_load")]
+    STTTaskLoad(String),
     #[serde(rename = "load_whisper_data")]
     LoadWhisperData,
 }
@@ -40,7 +42,16 @@ pub enum Event {
     STTTaskEnd(STTTaskProcess),
     #[serde(rename = "stt_task_list")]
     STTTaskList(Vec<STTTask>),
+    #[serde(rename = "stt_task_content")]
+    STTaskContent(Vec<STTTaskContent>),
     None,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct STTTaskContent{
+    pub content: String,
+    pub start: f64,
+    pub end: f64
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

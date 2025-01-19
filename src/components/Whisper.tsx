@@ -18,7 +18,7 @@ interface ListItemData {
 const ListItem = ({ index, style, data }: ListItemProps) => {
 	const result = data.items[index];
 	return (
-		<Link to={`/whisper/${index + 1}`} style={style} className="block">
+		<Link to={`/whisper/${result.id}`} style={style} className="block">
 			<div className="grid grid-cols-[2fr_1fr_1fr] items-center hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
 				{/* 文件名称 */}
 				<div className="text-sm">{result.fileName}</div>
@@ -127,7 +127,7 @@ interface SearchResult {
 	transcriptSnippets: string[];
 }
 
-const Whispser = () => {
+const Whisper = () => {
 	const [searchValue, setSearchValue] = useState("");
 	const [showClearButton, setShowClearButton] = useState(false);
 	const [resultsCount, setResultsCount] = useState(0);
@@ -317,4 +317,4 @@ const Whispser = () => {
 	);
 };
 
-export default Whispser;
+export default Whisper;

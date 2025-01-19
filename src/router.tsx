@@ -1,5 +1,5 @@
 import { createBrowserRouter } from "react-router-dom";
-import Whispser from "./components/Whisper";
+import Whisper from "./components/Whisper";
 import Settings from "./components/Settings";
 import Layout from "./Layout";
 import WhisperSettings from "./components/Settings/WhisperSettings";
@@ -46,7 +46,7 @@ export const router = createBrowserRouter([
     children: [
       { path: "logo", element: <div /> },
       { path: "whisper", children:[ 
-        { index: true, element: <Whispser /> },
+        { index: true, element: <Whisper /> },
         { path: ":id", element: <WhisperDetail /> } // 新增详情页
         ]
       },

@@ -75,6 +75,12 @@ pub fn run() {
                                     emit_event(&event, &handle);
                                 }
                             }
+                            Command::STTTaskLoad(id) => {
+                                if let Ok(task) = pool.fetch_trans(&id).await{
+                                    let event = Event::STTaskContent(task);
+                                    emit_event(&event, &handle);
+                                }
+                            }
                         }
                     }
                 }
@@ -186,12 +192,16 @@ fn exec_stt_task(path: &PathBuf, app: &AppHandle, db: &Db) -> Result<()> {
         }
         {
             // 解析json文件
-            let input = zimu_dir().join(&format!("{}.json", &task_id));
+            let input = zimu_dir().join(&format!("{}.wav.json", &task_id));
             if let Ok(data) = std::fs::File::open(&input).and_then(|file| {
                 serde_json::from_reader::<_, WhisperData>(file)
                     .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))
             }) {
-                for trans in data.transcription.iter() {}
+                for trans in data.transcription.iter() {
+                    let _ = db.insert_trans(trans,&task_id).await;
+                }
+            }else{
+                println!("======> 解析json文件失败");
             }
         }
     });

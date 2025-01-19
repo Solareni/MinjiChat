@@ -17,6 +17,5 @@ export interface AstaCommand {
 	command?: any;
 }
 export async function dispatchCommand(cmd: AstaCommand) {
-  console.log("dispatchCommand", cmd);
 	invoke("dispatch_command", { msg: JSON.stringify(cmd) });
 }

@@ -3,13 +3,14 @@ import { CaptionBackIcon, ActionIcon } from "./SvgIcons";
 import { VariableSizeList as List } from "react-window";
 import speaker1 from "../assets/1.png";
 import React, { useState, useRef, useCallback, useEffect } from "react";
-import { generateData } from "../mock";
+import { dispatchCommand } from "../types";
+import { listen } from "@tauri-apps/api/event";
+// import { generateData } from "../mock";
 
-interface MessageProps {
+interface WhisperDetailProps {
 	content: string;
 	start: number;
 	end: number;
-	searchKeyworkd?: string;
 }
 const MessageTime = React.memo(
 	({ start, end }: { start: number; end: number }) => {
@@ -27,37 +28,39 @@ const MessageTime = React.memo(
 		);
 	}
 );
-
-const Message = React.memo(
-	({ content, start, end, searchKeyworkd }: MessageProps) => {
-		const highlightText = (text: string, keyword?: string) => {
-			if (!keyword) {
-				return text;
-			}
-			const regex = new RegExp(keyword, "gi");
-			return text.replace(
-				regex,
-				(match) => `<span class="bg-yellow-200 text-yellow-900">${match}</span>`
-			);
-		};
-		return (
-			<div className="flex bg-slate-100 px-4 py-4 pt-6 dark:bg-slate-900 sm:px-6 border-b border-slate-200 dark:border-slate-700">
-				<div className="relative mt-2">
-					<MessageTime start={start} end={end} />
-				</div>
-				<div className="flex min-w-0 flex-1 items-start gap-x-4 mt-2">
-					<div className="min-w-0 flex-auto">
-						<p className="break-words pt-1">
-							{highlightText(content, searchKeyworkd)}
-						</p>
-					</div>
+interface MessageProps {
+	message: WhisperDetailProps;
+	searchKeyworkd?: string;
+}
+const Message = React.memo(({ message, searchKeyworkd }: MessageProps) => {
+	const highlightText = (text: string, keyword?: string) => {
+		if (!keyword) {
+			return text;
+		}
+		const regex = new RegExp(keyword, "gi");
+		return text.replace(
+			regex,
+			(match) => `<span class="bg-yellow-200 text-yellow-900">${match}</span>`
+		);
+	};
+	return (
+		<div className="flex bg-slate-100 px-4 py-4 pt-6 dark:bg-slate-900 sm:px-6 border-b border-slate-200 dark:border-slate-700">
+			<div className="relative mt-2">
+				<MessageTime start={message.start} end={message.end} />
+			</div>
+			<div className="flex min-w-0 flex-1 items-start gap-x-4 mt-2">
+				<div className="min-w-0 flex-auto">
+					<p className="break-words pt-1">
+						{highlightText(message.content, searchKeyworkd)}
+					</p>
 				</div>
 			</div>
-		);
-	}
-);
+		</div>
+	);
+});
+
 interface ItemData {
-	items: any[];
+	items: WhisperDetailProps[];
 	setSize: (index: number, size: number) => void;
 	searchKeyword?: string;
 }
@@ -104,12 +107,7 @@ const Row = ({
 	return (
 		<div style={style}>
 			<div ref={rowRef}>
-				<Message
-					content={item.content}
-					start={item.start}
-					end={item.end}
-					searchKeyworkd={data.searchKeyword}
-				/>
+				<Message message={item} searchKeyworkd={data.searchKeyword} />
 			</div>
 		</div>
 	);
@@ -117,7 +115,32 @@ const Row = ({
 
 export const WhisperDetail = () => {
 	const { id } = useParams();
-	const [message] = useState(generateData());
+	const [message, setMessage] = useState<WhisperDetailProps[]>([]);
+
+	useEffect(() => {
+		dispatchCommand({ type: "stt_task_load", command: id });
+	}, [id]);
+
+	useEffect(() => {
+		const unsubscribe = listen<string>("emit_event", (event) => {
+			const payload = JSON.parse(event.payload);
+			switch (payload.type) {
+				case "stt_task_content": {
+					const data = payload.event;
+					setMessage(data);
+					break;
+				}
+
+				default: {
+					console.log(`未知事件 ${event}`);
+				}
+			}
+		});
+		return () => {
+			unsubscribe.then((unlisten) => unlisten());
+		};
+	}, []);
+
 	const listRef = useRef<any>(null);
 
 	const listContainerRef = useRef<HTMLDivElement>(null);
@@ -189,7 +212,7 @@ export const WhisperDetail = () => {
 					<CaptionBackIcon />
 				</button>
 				<div className="ml-4">
-					<h1 className="text-2xl font-bold">Whisper {id}</h1>
+					<h1 className="text-2xl font-bold">{id}</h1>
 					<p className="text-sm text-gray-500">创建时间: 2023-10-01 12:00:00</p>
 				</div>
 			</div>

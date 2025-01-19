@@ -1,3 +1,4 @@
+use crate::types::{STTTaskContent, Transcription};
 use crate::{extension::zimu_dir, types::STTTask};
 use anyhow::{Context, Result};
 use sqlx::sqlite::SqliteQueryResult;
@@ -16,7 +17,6 @@ impl Db {
             .await
             .context("Failed to fetch tasks")?;
 
-
         Ok(tasks
             .iter()
             .map(|row| STTTask {
@@ -26,6 +26,38 @@ impl Db {
                 created_at: row.get("created_at"),
             })
             .collect::<Vec<_>>())
+    }
+    pub async fn fetch_trans(&self, task_id: &str) -> Result<Vec<STTTaskContent>> {
+        let trans = sqlx::query("SELECT * FROM stt_sentences WHERE task_id = $1")
+            .bind(task_id)
+            .fetch_all(&self.pool)
+            .await
+            .context("Failed to fetch trans")?;
+        Ok(trans
+            .iter()
+            .map(|row| STTTaskContent {
+                content: row.get("text"),
+                start: row.get("start_timestamp"),
+                end: row.get("end_timestamp"),
+            })
+            .collect::<Vec<_>>())
+    }
+    pub async fn insert_trans(&self, trans: &Transcription, task_id: &str) -> Result<()> {
+        match sqlx::query(
+            "INSERT INTO stt_sentences (task_id, start_timestamp, end_timestamp, text) VALUES ($1, $2, $3, $4)",
+        )
+        .bind(task_id)
+        .bind(&trans.offsets.from)
+        .bind(&trans.offsets.to)
+        .bind(&trans.text)
+        .execute(&self.pool)
+        .await{
+            Ok(_) => Ok(()),
+            Err(e) => {
+                info!(?e);
+                Err(e.into())
+            }
+        }
     }
     pub async fn insert_task(&self, task: &STTTask) -> Result<()> {
         info!(?task);
@@ -40,6 +72,7 @@ impl Db {
         .await{
             Ok(_) => Ok(()),
             Err(e) => {
+                info!(?e);
                 Err(e.into())
             }
         }
@@ -69,8 +102,8 @@ impl Db {
             "CREATE TABLE IF NOT EXISTS stt_sentences (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 task_id TEXT NOT NULL,
-                start_timestamp INTEGER NOT NULL,
-                end_timestamp INTEGER NOT NULL,
+                start_timestamp REAL NOT NULL,
+                end_timestamp REAL NOT NULL,
                 text TEXT NOT NULL,
                 FOREIGN KEY(task_id) REFERENCES stt_tasks(id)
             )",
