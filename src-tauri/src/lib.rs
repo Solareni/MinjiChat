@@ -65,19 +65,25 @@ pub fn run() {
                 loop {
                     if let Ok(cmd) = async_proc_rx.recv_async().await {
                         match cmd {
-                            Command::STTTaskProcess(path) => {
+                            Command::STTProcessTask(path) => {
                                 let path = PathBuf::from(path);
                                 let _ = exec_stt_task(&path, &handle, &pool);
                             }
-                            Command::LoadWhisperData => {
+                            Command::STTFetchTaskList => {
                                 if let Ok(tasks) = pool.fetch_tasks().await{
                                     let event = Event::STTTaskList(tasks);
                                     emit_event(&event, &handle);
                                 }
                             }
-                            Command::STTTaskLoad(id) => {
+                            Command::STTFetchTaskTrans(id) => {
                                 if let Ok(task) = pool.fetch_trans(&id).await{
                                     let event = Event::STTaskContent(task);
+                                    emit_event(&event, &handle);
+                                }
+                            }
+                            Command::STTFetchTaskSimple(id) => {
+                                if let Ok(task) = pool.fetch_task(&id).await{
+                                    let event = Event::STTaskSimple(task);
                                     emit_event(&event, &handle);
                                 }
                             }

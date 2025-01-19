@@ -11,6 +11,19 @@ pub struct Db {
 }
 
 impl Db {
+    pub async fn fetch_task(&self, task_id: &str) -> Result<STTTask> {
+        let task = sqlx::query("SELECT * FROM stt_tasks WHERE id = $1")
+            .bind(task_id)
+            .fetch_one(&self.pool)
+            .await
+            .context("Failed to fetch task")?;
+        Ok(STTTask {
+            id: task.get("id"),
+            file_name: task.get("file_name"),
+            duration: task.get("duration"),
+            created_at: task.get("created_at"),
+        })
+    }
     pub async fn fetch_tasks(&self) -> Result<Vec<STTTask>> {
         let tasks = sqlx::query("SELECT * FROM stt_tasks")
             .fetch_all(&self.pool)
@@ -69,7 +82,8 @@ impl Db {
         .bind(&task.duration)
         .bind(&task.created_at)
         .execute(&self.pool)
-        .await{
+        .await
+        {
             Ok(_) => Ok(()),
             Err(e) => {
                 info!(?e);

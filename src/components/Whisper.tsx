@@ -219,7 +219,7 @@ const Whisper = () => {
 			}
 		});
 
-		dispatchCommand({ type: "load_whisper_data" });
+		dispatchCommand({ type: "stt_fetch_task_list" });
 
 		return () => {
 			unsubscribe.then((unlisten) => unlisten());

@@ -1,11 +1,21 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { CaptionBackIcon, ActionIcon } from "./SvgIcons";
+import { CaptionBackIcon } from "./SvgIcons";
 import { VariableSizeList as List } from "react-window";
-import speaker1 from "../assets/1.png";
 import React, { useState, useRef, useCallback, useEffect } from "react";
-import { dispatchCommand } from "../types";
+import { dispatchCommand, WhisperItem } from "../types";
 import { listen } from "@tauri-apps/api/event";
-// import { generateData } from "../mock";
+
+function formatTime(ms: number): string {
+	const totalSeconds = Math.floor(ms / 1000);
+	const hours = Math.floor(totalSeconds / 3600);
+	const minutes = Math.floor((totalSeconds % 3600) / 60);
+	const seconds = totalSeconds % 60;
+
+	// 使用 padStart 补零
+	const pad = (num: number) => num.toString().padStart(2, "0");
+
+	return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+}
 
 interface WhisperDetailProps {
 	content: string;
@@ -16,13 +26,16 @@ const MessageTime = React.memo(
 	({ start, end }: { start: number; end: number }) => {
 		return (
 			<div className="absolute -top-4 left-0 text-xs text-slate-500 whitespace-nowrap flex items-center">
-				<img
-					src={speaker1} // 使用占位符图片
-					alt="Avatar"
-					className="h-5 w-5 rounded-full"
+				<div
+					style={{
+						width: "20px",
+						height: "20px",
+						borderRadius: "50%",
+						backgroundColor: "#0000a0", // 你可以根据需要修改颜色
+					}}
 				/>
 				<span className="ml-2">
-					{start}s - {end}s
+					{formatTime(start)}s - {formatTime(end)}s
 				</span>
 			</div>
 		);
@@ -116,9 +129,10 @@ const Row = ({
 export const WhisperDetail = () => {
 	const { id } = useParams();
 	const [message, setMessage] = useState<WhisperDetailProps[]>([]);
-
+	const [task, setTask] = useState<WhisperItem>();
 	useEffect(() => {
-		dispatchCommand({ type: "stt_task_load", command: id });
+		dispatchCommand({ type: "stt_fetch_task_trans", command: id });
+		dispatchCommand({ type: "stt_fetch_task_simple", command: id });
 	}, [id]);
 
 	useEffect(() => {
@@ -128,6 +142,12 @@ export const WhisperDetail = () => {
 				case "stt_task_content": {
 					const data = payload.event;
 					setMessage(data);
+					break;
+				}
+
+				case "stt_task_simple": {
+					const data = payload.event;
+					setTask(data);
 					break;
 				}
 
@@ -212,8 +232,8 @@ export const WhisperDetail = () => {
 					<CaptionBackIcon />
 				</button>
 				<div className="ml-4">
-					<h1 className="text-2xl font-bold">{id}</h1>
-					<p className="text-sm text-gray-500">创建时间: 2023-10-01 12:00:00</p>
+					<h1 className="text-2xl font-bold">{task?.fileName}</h1>
+					<p className="text-sm text-gray-500">创建时间: {task?.createdAt} </p>
 				</div>
 			</div>
 
@@ -226,7 +246,6 @@ export const WhisperDetail = () => {
 						placeholder="搜索..."
 						className="px-2 py-1 border rounded dark:bg-gray-800 dark:border-gray-700"
 					/>
-					<ActionIcon />
 				</div>
 			</div>
 

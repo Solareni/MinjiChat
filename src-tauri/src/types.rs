@@ -23,12 +23,14 @@ pub struct Offsets {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type", content = "command")]
 pub enum Command {
-    #[serde(rename = "stt_task_process")]
-    STTTaskProcess(String),
-    #[serde(rename = "stt_task_load")]
-    STTTaskLoad(String),
-    #[serde(rename = "load_whisper_data")]
-    LoadWhisperData,
+    #[serde(rename = "stt_process_task")]
+    STTProcessTask(String),
+    #[serde(rename = "stt_fetch_task_trans")]
+    STTFetchTaskTrans(String),
+    #[serde(rename = "stt_fetch_task_list")]
+    STTFetchTaskList,
+    #[serde(rename = "stt_fetch_task_simple")]
+    STTFetchTaskSimple(String)
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -44,7 +46,8 @@ pub enum Event {
     STTTaskList(Vec<STTTask>),
     #[serde(rename = "stt_task_content")]
     STTaskContent(Vec<STTTaskContent>),
-    None,
+    #[serde(rename = "stt_task_simple")]
+    STTaskSimple(STTTask),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
