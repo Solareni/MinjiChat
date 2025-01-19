@@ -44,6 +44,28 @@ interface ItemData {
 	searchKeyword?: string;
 }
 
+const highlightText = (text: string, keyword?: string) => {
+	if (!keyword) {
+	  return <>{text}</>;
+	}
+	const regex = new RegExp(keyword, "gi");
+	const parts = text.split(regex);
+	return (
+	  <>
+		{parts.map((part, i) => (
+		  <span key={i}>
+			{part}
+			{i < parts.length - 1 && (
+			  <span className="bg-yellow-200 text-yellow-900">
+				{text.match(regex)?.[i]}
+			  </span>
+			)}
+		  </span>
+		))}
+	  </>
+	);
+  };
+
 const SearchResultItem = ({
 	index,
 	style,
@@ -102,7 +124,7 @@ const SearchResultItem = ({
 								maxWidth: "100%",
 							}}
 						>
-							{snippet}
+							{highlightText(snippet, data.searchKeyword)}
 						</div>
 					))}
 				</div>
@@ -277,6 +299,7 @@ const Whisper = () => {
 					<VirtualList
 						message={searchResults}
 						className="w-full h-full"
+						searchKeyword={searchValue}
 						rowRenderer={SearchResultItem}
 					/>
 				</div>
