@@ -132,28 +132,34 @@ export const WhisperDetail = () => {
 	const handleSearch = (text: string) => {
 		if (searchKeyword !== text) {
 			setSearchIndex(0);
+			listRef.current?.scrollToItem(0, "center");
 			setSearchItems([]);
 		}
 		setSearchKeyword(text);
 		if (searchItems.length > 0) {
 			setSearchIndex((prev) => (prev + 1) % searchItems.length);
-		} else{
+			const item = searchItems[searchIndex];
+			listRef.current?.scrollToItem(item.index, "center");
+		} else {
 			const items = message.filter((item, index) => {
 				item.index = index;
 				return item.content.includes(text);
 			});
-			console.log(`${JSON.stringify(items)}`)
 			setSearchItems(items);
 			setSearchIndex(0);
+			listRef.current?.scrollToItem(0, "center");
 		}
 	};
 
 	const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
 		if (event.key === "Enter") {
-			handleSearch(inputRef.current?.value || '');
+			handleSearch(inputRef.current?.value || "");
+		}else{
+			setSearchKeyword("")
 		}
 	};
 	const inputRef = useRef<HTMLInputElement>(null);
+	const listRef = useRef<any>(null);
 
 	const navigate = useNavigate();
 	return (
@@ -186,6 +192,7 @@ export const WhisperDetail = () => {
 				</div>
 			</div>
 			<VirtualList
+				ref={listRef}
 				className="flex-1 relative bg-slate-50 text-sm leading-6 text-slate-900 shadow-md dark:bg-slate-900 dark:text-slate-50 sm:text-base sm:leading-7 w-full h-full"
 				style={{ overflow: "hidden" }}
 				message={message}
